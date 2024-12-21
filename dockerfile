@@ -13,8 +13,6 @@ RUN gradle clean build
 # 실행 단계 (JDK 21 기반)
 FROM openjdk:21-jdk-slim
 
-WORKDIR /app
-
 # 빌드한 JAR 파일을 복사
 COPY --from=builder /app/build/libs/*.jar app.jar
 
