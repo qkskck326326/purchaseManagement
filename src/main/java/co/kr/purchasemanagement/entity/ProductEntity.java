@@ -23,9 +23,26 @@ public class ProductEntity {
     @Column(name = "product_quantity")
     private int productQuantity;
 
-    private int like;
+    @Column(name = "like_count")
+    private int likeCount;
+
+    @Column(name = "create_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createAt;
 
     @Column(name = "update_at")
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date updateAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createAt = new Date();
+        updateAt = new Date();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updateAt = new Date();
+    }
+
 }

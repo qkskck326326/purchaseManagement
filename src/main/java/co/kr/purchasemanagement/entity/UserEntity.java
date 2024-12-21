@@ -14,10 +14,7 @@ import java.util.Date;
 public class UserEntity {
 
     @Id
-    @Column(name = "user_id")
-    private String userId;
-
-    @Column(nullable = false)
+    @Column(name = "email")
     private String email;
 
     @Column(nullable = false)
@@ -29,11 +26,17 @@ public class UserEntity {
     @Column(name = "signup_at")
     private Date signupAt;
 
+    @Column(name = "address")
     private String address;
+
+    @Column(name = "isVerify")
+    private boolean isVerify = false;
 
     @Column(name = "mobile_No")
     private String mobileNo;
 
-    @Column(name = "profile_image")
-    private String profileImage;
+    @PrePersist
+    protected void onCreate() {
+        signupAt = new Date();
+    }
 }

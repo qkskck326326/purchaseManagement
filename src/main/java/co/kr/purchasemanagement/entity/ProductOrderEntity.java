@@ -3,9 +3,6 @@ package co.kr.purchasemanagement.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import co.kr.purchasemanagement.entity.UserEntity;
-import co.kr.purchasemanagement.entity.ProductEntity;
-
 import java.util.Date;
 
 @Entity
@@ -24,13 +21,18 @@ public class ProductOrderEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
-    private ProductEntity product;
+    @Column(name = "product_id", nullable = false)
+    private Long productId;
 
+    @Column(name = "quantity", nullable = false)
     private int quantity;
 
-    @Column(name = "order_at")
+    @Column(name = "order_at", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date orderAt;
+
+    @PrePersist
+    protected void onCreate() {
+        orderAt = new Date();
+    }
 }
