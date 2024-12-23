@@ -18,17 +18,24 @@ public class WishListEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity user;
+    @Column(name = "user_email", nullable = false)
+    private String userEmail;
 
     @Column(name = "product_id")
-    private String productId;
+    private Long productId;
 
     @Column(name = "product_name", nullable = false)
     private String productName;
 
-    @Column(name = "product_image")
-    private String productImage;
+    @Column(name = "quantity")
+    private int quantity;
+
+
+    public WishListEntity(ProductEntity product, String userEmail, int quantity) {
+        this.userEmail = userEmail;
+        this.productId = product.getProductId();
+        this.productName = product.getProductName();
+        this.quantity = quantity;
+    }
 
 }
