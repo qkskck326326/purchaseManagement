@@ -21,6 +21,9 @@ public class ProductOrderEntity {
     @JoinColumn(name = "user_email", referencedColumnName = "email", nullable = false)
     private UserEntity userEmail;
 
+    @Column(name = "order_state")
+    private OrderStateEnum orderState;
+
     @Column(name = "order_at", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date orderAt;
@@ -28,6 +31,7 @@ public class ProductOrderEntity {
     @PrePersist
     protected void onCreate() {
         orderAt = new Date();
+        this.orderState = OrderStateEnum.Order_Completed;
     }
 
     public ProductOrderEntity(String userEmail) {

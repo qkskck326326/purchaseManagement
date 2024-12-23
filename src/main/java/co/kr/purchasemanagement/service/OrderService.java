@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -74,18 +75,40 @@ public class OrderService {
     @Transactional
     public String orderProducts(List<OrderListRequestDto> orderListRequestDto, String userEmail) {
         try {
+            // 재고 확인 및 감소
+            for (OrderListRequestDto orderList : orderListRequestDto) {
+                checkQuantityOrThrow(orderList);
+            }
+
+            // 주문서 저장
             ProductOrderEntity order = new ProductOrderEntity(userEmail);
             productOrderRepository.save(order);
 
+            // 주문 리스트로 변환 및 저장
             List<ProductOrderListEntity> orderList = orderListRequestDto.stream()
-                    .map(dto -> new ProductOrderListEntity(order.getOrderId(), dto)).toList();
-
+                    .map(dto -> new ProductOrderListEntity(order.getOrderId(), dto))
+                    .toList();
             productOrderListRepository.saveAll(orderList);
-        } catch (Exception e) {
-            return "주문 진행 중 오류가 발생하였습니다.";
+
+            return "주문이 완료되었습니다.";
+        } catch (RuntimeException e) {
+            return "주문 진행 중 오류: " + e.getMessage();
         }
-        return "주문이 완료되었습니다.";
     }
 
+
+    // 재고 확인 및 감소 메소드
+    public void checkQuantityOrThrow(OrderListRequestDto orderListRequestDto) {
+        Optional<ProductEntity> productO = productRepository.findById(orderListRequestDto.getProductId());
+        ProductEntity product = productO.orElseThrow(() ->
+                new RuntimeException(orderListRequestDto.getProductName() + " 이 현재 존재하지 않습니다."));
+
+        if (product.getProductQuantity() >= orderListRequestDto.getQuantity()) {
+            product.setProductQuantity(product.getProductQuantity() - orderListRequestDto.getQuantity());
+            productRepository.save(product);
+        } else {
+            throw new RuntimeException(orderListRequestDto.getProductName() + " 의 재고가 부족합니다.");
+        }
+    }
     
 }
