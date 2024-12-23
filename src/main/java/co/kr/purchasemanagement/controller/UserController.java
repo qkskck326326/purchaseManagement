@@ -14,6 +14,9 @@ public class UserController {
 
     @PostMapping("/sign")
     public String sign(@RequestBody UserEntity user) {
+        if (user.getUserName() == null || user.getEmail() == null || user.getPassword() == null) {
+            return "이름, 전화번호, 주소는 반드시 입력하셔야 합니다.";
+        }
         return userService.sign(user);
     }
 
