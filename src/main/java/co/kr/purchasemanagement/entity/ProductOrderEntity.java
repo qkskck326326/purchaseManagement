@@ -18,7 +18,7 @@ public class ProductOrderEntity {
     private Long orderId;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_email", nullable = false)
     private UserEntity user;
 
     @Column(name = "product_id", nullable = false)
