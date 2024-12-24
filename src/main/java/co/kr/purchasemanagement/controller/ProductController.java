@@ -1,7 +1,6 @@
 package co.kr.purchasemanagement.controller;
 
 import co.kr.purchasemanagement.dto.ProductResponseDto;
-import co.kr.purchasemanagement.dto.WishListResponseDto;
 import co.kr.purchasemanagement.entity.ProductEntity;
 import co.kr.purchasemanagement.service.OrderService;
 import co.kr.purchasemanagement.service.ProductService;
@@ -19,7 +18,7 @@ public class ProductController {
     private final OrderService orderService;
 
     // 상품 리스트
-    @GetMapping("/")
+    @GetMapping
     public List<ProductResponseDto> getList(@RequestParam int size,
                                             @RequestParam int page) {
         return productService.getList(size, page);

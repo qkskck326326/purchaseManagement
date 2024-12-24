@@ -41,7 +41,7 @@ public class OrderService {
                 wishListRepository.save(new WishListEntity(product, userEmail, quantity));
                 return "장바구니에 해당 상품이 추가되었습니다.";
             }else {
-                return "장바구니 추가 중 에러가 발생하였습니다.";
+                return "해당 상품이 존재하지 않습니다..";
             }
 
         }
@@ -60,6 +60,10 @@ public class OrderService {
     
     // 장바구니에서 상품 삭제
     public String deleteQuantityWishList(Long wishListId) {
+        // 존재 확인
+        if(wishListRepository.existsById(wishListId)) {
+            return "위시리스트에 해당 상품이 없습니다.";
+        }
         try {
             wishListRepository.deleteById(wishListId);
         } catch (Exception e) {
