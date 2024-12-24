@@ -28,6 +28,14 @@ public class ProductOrderEntity {
     @Temporal(TemporalType.DATE)
     private Date orderAt;
 
+    @Column(name = "update_at")
+    @Temporal(TemporalType.DATE)
+    private Date updateAt;
+
+    @Column(name = "refund_at")
+    @Temporal(TemporalType.DATE)
+    private Date refundAt;
+
     @PrePersist
     protected void onCreate() {
         orderAt = new Date();

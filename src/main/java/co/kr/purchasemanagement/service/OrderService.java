@@ -2,18 +2,15 @@ package co.kr.purchasemanagement.service;
 
 import co.kr.purchasemanagement.dto.OrderListRequestDto;
 import co.kr.purchasemanagement.dto.WishListResponseDto;
-import co.kr.purchasemanagement.entity.ProductEntity;
-import co.kr.purchasemanagement.entity.ProductOrderEntity;
-import co.kr.purchasemanagement.entity.ProductOrderListEntity;
-import co.kr.purchasemanagement.entity.WishListEntity;
-import co.kr.purchasemanagement.repository.ProductOrderListRepository;
-import co.kr.purchasemanagement.repository.ProductOrderRepository;
-import co.kr.purchasemanagement.repository.ProductRepository;
-import co.kr.purchasemanagement.repository.WishListRepository;
+import co.kr.purchasemanagement.entity.*;
+import co.kr.purchasemanagement.repository.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -111,4 +108,83 @@ public class OrderService {
         }
     }
     
+    
+    // 주문 취소
+    @Transactional
+    public String OrderCancellation(Long orderId, String userEmail) {
+        Optional<ProductOrderEntity> orderO = productOrderRepository.findById(orderId);
+        ProductOrderEntity order;
+        if (orderO.isPresent()) {
+            order = orderO.get();
+        }else {
+            return "주문취소 오류 : 주문번호 오류";
+        }
+        
+        // 주문서의 유저 이름 꺼내기
+        String orderUser = order.getUserEmail().getEmail();
+        
+        // 주문한 유저와 신청 유저의 email 이 다르다면
+        if (orderUser.equals(userEmail)) {
+            return "주문취소 오류 : 잘못된 접근";
+        }
+
+        if (order.getOrderState() != OrderStateEnum.Order_Completed){
+            return "주문취소 오류 : 이미 배송된 상품은 주문취소가 불가합니다.";
+        }
+        
+        // 재고처리
+        List<ProductOrderListEntity> orderLists = productOrderListRepository.findAllByOrderId(orderId);
+        for (ProductOrderListEntity orderList : orderLists) {
+            Optional<ProductEntity> productO = productRepository.findById(orderList.getProductId());
+            ProductEntity product;
+            if (productO.isPresent()) {
+                product = productO.get();
+                product.setProductQuantity(product.getProductQuantity() - orderList.getQuantity());
+                productRepository.save(product);
+            }
+        }
+
+        order.setOrderState(OrderStateEnum.Order_Cancellation);
+        productOrderRepository.save(order);
+        return "주문이 취소되었습니다.";
+    }
+
+    // 반품 신청
+    public String orderRefund(Long orderId, String userEmail) {
+        Optional<ProductOrderEntity> orderO = productOrderRepository.findById(orderId);
+        ProductOrderEntity order;
+        if (orderO.isPresent()) {
+            order = orderO.get();
+        }else {
+            return "반품신청 오류 : 주문 번호 오류";
+        }
+
+        // 주문서의 유저 이름 꺼내기
+        String orderUser = order.getUserEmail().getEmail();
+
+        // 주문한 유저와 신청 유저의 email 이 다르다면
+        if (orderUser.equals(userEmail)) {
+            return "반품신청 오류 : 잘못된 접근";
+        }
+        
+        // 상품을 받은지 1일 이상이 지났다면
+
+        if (order.getOrderState() != OrderStateEnum.Delivery_Completed){
+            return "반품신청 오류 : 배송완료 되지 않은 상품은 반품이 불가능합니다.";
+        }
+        
+        // 시간계산
+        LocalDateTime limitTime = order.getUpdateAt()
+                .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+                .plusDays(1);   // LocalDateTime 으로 변환 및 배송받은 날짜로부터 1일 추가
+        if (limitTime.isAfter(LocalDateTime.now())) {
+            return "반품신청 오류 : 배송완료 후 만 1일이 지난 상품은 환불이 불가능합니다.";
+        }
+
+        // 주문의 Status 변환
+        order.setOrderState(OrderStateEnum.Refunding);
+        order.setRefundAt(new Date());
+        productOrderRepository.save(order);
+        return "반품신청이 완료되었습니다.";
+    }
 }

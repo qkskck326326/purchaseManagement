@@ -43,4 +43,16 @@ public class OrderController {
     public String orderProducts(@RequestBody List<OrderListRequestDto> orderList, @RequestParam String userEmail) {
         return orderService.orderProducts(orderList, userEmail);
     }
+    
+    // 주문 취소 /// 편집점 - 추후 결제 관련 로직 필요, userEmail 가져와서 본인주문인지 확인 필요
+    @PostMapping("/order/cancellation")
+    public String orderCancellation(@RequestParam Long orderId, @RequestParam String userEmail) {
+        return orderService.OrderCancellation(orderId, userEmail);
+    }
+
+    // 반품신청 /// 편집점 - 추후 결제 관련 로직 필요, userEmail 가져와서 본인주문인지 확인 필요
+    @PostMapping("/order/refund")
+    public String orderRefund(@RequestParam Long orderId, @RequestParam String userEmail) {
+        return orderService.orderRefund(orderId, userEmail);
+    }
 }
