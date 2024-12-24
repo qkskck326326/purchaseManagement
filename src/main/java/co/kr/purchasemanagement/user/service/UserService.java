@@ -51,7 +51,7 @@ public class UserService {
 
         String subject = "회원가입 이메일 인증";
         String content = "다음 링크를 클릭하여 이메일 인증을 완료하세요: "
-                + "http://" + hostName + ":"+ portNumber + "/user/verify?code=" + verificationCode + "&email=" + to;
+                + "http://" + hostName + ":"+ portNumber + "/api/user/verify?code=" + verificationCode + "&email=" + to;
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to); // 수신자 이메일
