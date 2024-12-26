@@ -3,6 +3,7 @@ package co.kr.purchasemanagement.user.controller;
 import co.kr.purchasemanagement.user.entity.UserEntity;
 import co.kr.purchasemanagement.user.service.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +30,13 @@ public class UserController {
     @GetMapping("/verify")
     public void verifyUser(@RequestParam String code, @RequestParam String email) {
         userService.verifyEmail(code, email);
+    }
+
+    // 비밀번호 변경
+    @PostMapping("/change-password")
+    public String changePassword(@RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken, String password) {
+        String hashedPassword = passwordEncoder.encode(password);
+        return userService.changePassword(bearerToken, hashedPassword);
     }
 
 }

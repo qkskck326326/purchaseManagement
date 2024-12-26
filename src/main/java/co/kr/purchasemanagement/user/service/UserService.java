@@ -1,5 +1,7 @@
 package co.kr.purchasemanagement.user.service;
 
+import co.kr.purchasemanagement.security.JwtTokenUtil;
+import co.kr.purchasemanagement.security.RedisUtil;
 import co.kr.purchasemanagement.user.entity.EmailVerificationEntity;
 import co.kr.purchasemanagement.user.entity.UserEntity;
 import co.kr.purchasemanagement.user.repository.EmailVerificationRepository;
@@ -8,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -15,9 +18,11 @@ import java.util.UUID;
 @AllArgsConstructor
 public class UserService {
 
-    private JavaMailSender mailSender;
+    private final JwtTokenUtil jwtTokenUtil;
+    private final JavaMailSender mailSender;
     private final UserRepository userRepository;
     private final EmailVerificationRepository emailVerificationRepository;
+    private final RedisUtil redisUtil;
 
     public String sign(UserEntity user) {
         // 아이디가 이미 존재하면
@@ -64,5 +69,23 @@ public class UserService {
         // 이메일 및 코드 저장
         emailVerificationRepository.save(new EmailVerificationEntity(to, verificationCode));
 
+    }
+
+    @Transactional
+    public String changePassword(String bearerToken, String password) {
+        // 토큰 이메일로 변환
+        String token = bearerToken.substring(7);
+        String email = jwtTokenUtil.getUserEmailFromToken(token);
+        
+        try {
+            UserEntity user = userRepository.findByEmail(email); // 이메일로 해당 유저 가져오기
+            user.setPassword(password); // 비밀번호 변경
+            userRepository.save(user); // 저장
+    
+            redisUtil.logoutAll(email); // 변경 완료시 모든곳에서 로그아웃
+        } catch (Exception e) {
+            return "비밀번호 변경 에러 : " + e.getMessage();
+        }
+        return "비밀번호 변경 완료, 모든 장소에서 로그아웃 처리되었습니다.";
     }
 }
