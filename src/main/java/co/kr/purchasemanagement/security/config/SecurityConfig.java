@@ -26,8 +26,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 @AllArgsConstructor
 public class SecurityConfig {
-    private final JwtTokenUtil jwtTokenUtil;
-    private final CustomUserDetailsService customUserDetailsService;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -38,7 +37,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/security/login", "/api/user/register", "/api/user/verify**").permitAll() // 인증 없이 접근 가능 경로
                         .anyRequest().authenticated() // 그 외의 모든 요청은 인증 필요
                 )
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenUtil, customUserDetailsService), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .cors(withDefaults()) // CORS 설정을 활성화
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint((request, response, authException) -> {
