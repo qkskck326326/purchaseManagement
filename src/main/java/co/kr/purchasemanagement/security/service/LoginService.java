@@ -1,4 +1,4 @@
-package co.kr.purchasemanagement.service;
+package co.kr.purchasemanagement.security.service;
 
 import co.kr.purchasemanagement.security.GetUserInfo;
 import co.kr.purchasemanagement.security.JwtTokenUtil;

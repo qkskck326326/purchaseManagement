@@ -4,6 +4,7 @@ import co.kr.purchasemanagement.order.entity.OrderListRequestDto;
 import co.kr.purchasemanagement.user.entity.WishListResponseDto;
 import co.kr.purchasemanagement.order.service.OrderService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,21 +39,24 @@ public class OrderController {
         return orderService.deleteQuantityWishList(wishListId);
     }
 
-    // 상품 주문 /// 편집점 - 추후 토큰에서 userEmail 가져오는 형식으로 변경해야됨
+    // 상품 주문
     @PostMapping("/products")
-    public String orderProducts(@RequestBody List<OrderListRequestDto> orderList, @RequestParam String userEmail) {
-        return orderService.orderProducts(orderList, userEmail);
+    public String orderProducts(@RequestBody List<OrderListRequestDto> orderList, @RequestParam String userEmail,
+                                @RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
+        return orderService.orderProducts(orderList, bearerToken);
     }
     
-    // 주문 취소 /// 편집점 - 추후 결제 관련 로직 필요, userEmail 가져와서 본인주문인지 확인 필요
+    // 주문 취소
     @PostMapping("/cancellation")
-    public String orderCancellation(@RequestParam Long orderId, @RequestParam String userEmail) {
-        return orderService.OrderCancellation(orderId, userEmail);
+    public String orderCancellation(@RequestParam Long orderId, @RequestParam String userEmail,
+                                    @RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
+        return orderService.OrderCancellation(orderId, bearerToken);
     }
 
-    // 반품신청 /// 편집점 - 추후 결제 관련 로직 필요, userEmail 가져와서 본인주문인지 확인 필요
+    // 반품신청
     @PostMapping("/refund")
-    public String orderRefund(@RequestParam Long orderId, @RequestParam String userEmail) {
-        return orderService.orderRefund(orderId, userEmail);
+    public String orderRefund(@RequestParam Long orderId, @RequestParam String userEmail,
+                              @RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
+        return orderService.orderRefund(orderId, bearerToken);
     }
 }

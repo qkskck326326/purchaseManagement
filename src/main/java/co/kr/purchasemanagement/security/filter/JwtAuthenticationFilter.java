@@ -4,7 +4,7 @@ import co.kr.purchasemanagement.security.GetUserInfo;
 import co.kr.purchasemanagement.security.JwtAuthenticationToken;
 import co.kr.purchasemanagement.security.JwtTokenUtil;
 import co.kr.purchasemanagement.security.RedisUtil;
-import co.kr.purchasemanagement.service.CustomUserDetailsService;
+import co.kr.purchasemanagement.security.service.CustomUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

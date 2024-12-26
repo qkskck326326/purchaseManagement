@@ -1,8 +1,6 @@
 package co.kr.purchasemanagement.security.config;
 
-import co.kr.purchasemanagement.security.JwtTokenUtil;
 import co.kr.purchasemanagement.security.filter.JwtAuthenticationFilter;
-import co.kr.purchasemanagement.service.CustomUserDetailsService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;

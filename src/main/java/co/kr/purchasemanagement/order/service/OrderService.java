@@ -1,6 +1,7 @@
 package co.kr.purchasemanagement.order.service;
 
 import co.kr.purchasemanagement.order.entity.*;
+import co.kr.purchasemanagement.security.JwtTokenUtil;
 import co.kr.purchasemanagement.user.entity.WishListResponseDto;
 import co.kr.purchasemanagement.order.repository.ProductOrderListRepository;
 import co.kr.purchasemanagement.order.repository.ProductOrderRepository;
@@ -24,6 +25,7 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final ProductOrderRepository productOrderRepository;
     private final ProductOrderListRepository productOrderListRepository;
+    private final JwtTokenUtil jwtTokenUtil;
 
     // 장바구니 리스트 가져오기
     public List<WishListResponseDto> getWishList(String userEmail) {
@@ -77,7 +79,9 @@ public class OrderService {
 
     // 상품 주문 -- 편집점 -- 결제 관련 수정 필요
     @Transactional
-    public String orderProducts(List<OrderListRequestDto> orderListRequestDto, String userEmail) {
+    public String orderProducts(List<OrderListRequestDto> orderListRequestDto, String bearerToken) {
+        String token = bearerToken.substring(7);
+        String userEmail = jwtTokenUtil.getUserEmailFromToken(token);
         try {
             // 재고 확인 및 감소
             for (OrderListRequestDto orderList : orderListRequestDto) {
@@ -118,7 +122,9 @@ public class OrderService {
     
     // 주문 취소
     @Transactional
-    public String OrderCancellation(Long orderId, String userEmail) {
+    public String OrderCancellation(Long orderId, String bearerToken) {
+        String token = bearerToken.substring(7);
+        String userEmail = jwtTokenUtil.getUserEmailFromToken(token);
         Optional<ProductOrderEntity> orderO = productOrderRepository.findById(orderId);
         ProductOrderEntity order;
         if (orderO.isPresent()) {
@@ -157,7 +163,9 @@ public class OrderService {
     }
 
     // 반품 신청
-    public String orderRefund(Long orderId, String userEmail) {
+    public String orderRefund(Long orderId, String bearerToken) {
+        String token = bearerToken.substring(7);
+        String userEmail = jwtTokenUtil.getUserEmailFromToken(token);
         Optional<ProductOrderEntity> orderO = productOrderRepository.findById(orderId);
         ProductOrderEntity order;
         if (orderO.isPresent()) {

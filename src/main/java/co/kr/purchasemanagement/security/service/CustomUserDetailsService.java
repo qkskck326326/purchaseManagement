@@ -1,4 +1,4 @@
-package co.kr.purchasemanagement.service;
+package co.kr.purchasemanagement.security.service;
 
 import co.kr.purchasemanagement.security.entity.CustomUserDetails;
 import co.kr.purchasemanagement.user.entity.UserEntity;
