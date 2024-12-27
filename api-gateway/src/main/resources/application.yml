@@ -1,0 +1,45 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: API-GATEWAY
+  web:
+    resources:
+      add-mappings: false
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: false
+      routes:
+        - id: user-service-route
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/user/**
+          filters:
+            - RewritePath=/api/user/(?<segment>.*), /${segment}
+#        - id: order-service-route
+#          uri: lb://ORDER-SERVICE
+#          predicates:
+#            - Path=/api/order/**
+#        - id: product-service-route
+#          uri: lb://PRODUCT-SERVICE
+#          predicates:
+#            - Path=/api/product/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
