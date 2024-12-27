@@ -51,7 +51,7 @@ public class LoginService {
             return token;
 
         } catch (AuthenticationException e) {
-            return "이메일과 비밀번호가 일치하지 않습니다.";
+            return "이메일과 비밀번호가 일치하지 않습니다." + e.getMessage();
         }
     }
 
