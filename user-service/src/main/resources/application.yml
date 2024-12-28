@@ -1,0 +1,52 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: USER-SERVICE
+  datasource:
+    url: jdbc:mysql://localhost:3306/sparta
+    username: root
+    password: mysql3306
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: redis6379
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: spartapurchase@gmail.com
+    password: rwqwlhpxwvgeqnws
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+            required: true
+          auth: true
+  host-name: localhost
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+jwt:
+  secret: bzeXpcSoWC6x5gq5c2gk7DaifjAofTWMpwxUWQYqT5qaLHNHlZWWYyKTXUKqjVo8
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
