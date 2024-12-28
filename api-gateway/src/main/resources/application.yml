@@ -6,7 +6,7 @@ spring:
     name: API-GATEWAY
   web:
     resources:
-      add-mappings: false
+      add-mappings: false # 정적 리소스 매핑 비활성화
   cloud:
     gateway:
       discovery:
@@ -17,8 +17,6 @@ spring:
           uri: lb://USER-SERVICE
           predicates:
             - Path=/api/user/**
-          filters:
-            - RewritePath=/api/user/(?<segment>.*), /${segment}
 #        - id: order-service-route
 #          uri: lb://ORDER-SERVICE
 #          predicates:
@@ -32,14 +30,16 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true # IP 기반으로 등록
 
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG
-    reactor.netty: DEBUG
+    reactor.netty: DEBUG # Netty 디버깅 활성화
 
 management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: "*" # 모든 엔드포인트 노출
