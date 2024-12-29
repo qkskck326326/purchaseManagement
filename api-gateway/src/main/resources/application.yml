@@ -17,14 +17,16 @@ spring:
           uri: lb://USER-SERVICE
           predicates:
             - Path=/api/user/**
+
         - id: product-service-route
           uri: lb://PRODUCT-SERVICE
           predicates:
             - Path=/api/product/**
-#        - id: order-service-route
-#          uri: lb://ORDER-SERVICE
-#          predicates:
-#            - Path=/api/order/**
+
+        - id: order-service-route
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/api/order/**
 
 
 eureka:
