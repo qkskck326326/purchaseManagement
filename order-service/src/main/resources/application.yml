@@ -5,13 +5,13 @@ spring:
   application:
     name: ORDER-SERVICE
   datasource:
-    url: jdbc:mysql://localhost:3306/sparta
+    url: jdbc:mysql://localhost:3308/sparta
     username: root
     password: mysql3306
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
 
 jwt:
   secret: bzeXpcSoWC6x5gq5c2gk7DaifjAofTWMpwxUWQYqT5qaLHNHlZWWYyKTXUKqjVo8
