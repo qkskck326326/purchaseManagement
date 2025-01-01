@@ -3,9 +3,9 @@ server:
 
 spring:
   application:
-    name: PRODUCT-SERVICE
+    name: product-service
   datasource:
-    url: jdbc:mysql://localhost:3307/sparta
+    url: jdbc:mysql://product_db:3306/sparta
     username: root
     password: mysql3306
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -13,9 +13,18 @@ spring:
     hibernate:
       ddl-auto: create
 
+  kafka:
+    bootstrap-servers: kafka:9092  # docker-compose에서 정의한 Kafka 브로커 주소
+    consumer:
+      group-id: product-group          # Consumer 그룹 ID
+      auto-offset-reset: earliest   # 메시지를 처음부터 읽음
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
-  instance:
-    prefer-ip-address: true
+      defaultZone: http://eureka-server:8761/eureka

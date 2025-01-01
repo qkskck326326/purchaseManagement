@@ -43,6 +43,8 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5' // JWT API 기본 기능 제공
     implementation 'io.jsonwebtoken:jjwt-impl:0.11.5' // JWT 구현체 제공
     implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5' // JWT와 Jackson 통합 지원
+    // Kafka
+    implementation 'org.springframework.kafka:spring-kafka'
 }
 
 dependencyManagement {

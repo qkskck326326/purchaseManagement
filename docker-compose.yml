@@ -85,5 +85,66 @@ services:
       interval: 10s
       retries: 10
 
+  eureka-server:
+    build: ./eureka-server/.
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka
+    command: ["java", "-jar", "app.jar", "--spring.profiles.active=docker"]
+
+  api-gateway:
+    build: ./api-gateway/.
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka
+    command: [ "java", "-jar", "app.jar", "--spring.profiles.active=docker" ]
+
+  user-service:
+    build: ./user-service/.
+    depends_on:
+      user_db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka
+    command: [ "java", "-jar", "app.jar", "--spring.profiles.active=docker" ]
+
+  product-service:
+    build: ./product-service/.
+    depends_on:
+      product_db:
+        condition: service_healthy
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka
+    command: [ "java", "-jar", "app.jar", "--spring.profiles.active=docker" ]
+
+  order-service:
+    build: ./order-service/.
+    depends_on:
+      order_db:
+        condition: service_healthy
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka
+    command: [ "java", "-jar", "app.jar", "--spring.profiles.active=docker" ]
+
 volumes:
   kafka-data:
+
+networks:
+  default:
+    driver: bridge

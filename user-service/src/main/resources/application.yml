@@ -3,15 +3,15 @@ server:
 
 spring:
   application:
-    name: USER-SERVICE
+    name: user-service
   datasource:
-    url: jdbc:mysql://localhost:3306/sparta
+    url: jdbc:mysql://user_db:3306/sparta
     username: root
     password: mysql3306
     driver-class-name: com.mysql.cj.jdbc.Driver
   data:
     redis:
-      host: localhost
+      host: redis
       port: 6379
       password: redis6379
   mail:
@@ -47,6 +47,6 @@ logging:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
-  instance:
-    prefer-ip-address: true
+      defaultZone: http://eureka-server:8761/eureka/
+#  instance:
+#    prefer-ip-address: true
