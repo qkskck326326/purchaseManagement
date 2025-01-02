@@ -1,7 +1,7 @@
 package co.kr.orderservice.order.controller;
 
 
-import co.kr.orderservice.order.entity.OrderListRequestDto;
+import co.kr.orderservice.order.entity.OrderItemRequestDto;
 import co.kr.orderservice.order.entity.WishListResponseDto;
 import co.kr.orderservice.order.service.OrderService;
 import lombok.AllArgsConstructor;
@@ -40,24 +40,24 @@ public class OrderController {
         return orderService.deleteQuantityWishList(wishListId);
     }
 
-//    // 상품 주문
-//    @PostMapping("/products")
-//    public String orderProducts(@RequestBody List<OrderListRequestDto> orderList, @RequestParam String userEmail,
-//                                @RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
-//        return orderService.orderProducts(orderList, bearerToken);
-//    }
-//
-//    // 주문 취소
-//    @PostMapping("/cancellation")
-//    public String orderCancellation(@RequestParam Long orderId, @RequestParam String userEmail,
-//                                    @RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
-//        return orderService.OrderCancellation(orderId, bearerToken);
-//    }
-//
-//    // 반품신청
-//    @PostMapping("/refund")
-//    public String orderRefund(@RequestParam Long orderId, @RequestParam String userEmail,
-//                              @RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
-//        return orderService.orderRefund(orderId, bearerToken);
-//    }
+    // 상품 주문
+    @PostMapping("/products")
+    public String orderProducts(@RequestBody List<OrderItemRequestDto> orderList, @RequestParam String userEmail,
+                                @RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
+        return orderService.orderProducts(orderList, bearerToken);
+    }
+
+    // 주문 취소
+    @PostMapping("/cancellation")
+    public String orderCancellation(@RequestParam Long orderId, @RequestParam String userEmail,
+                                    @RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
+        return orderService.OrderCancellation(orderId, bearerToken);
+    }
+
+    // 반품신청
+    @PostMapping("/refund")
+    public String orderRefund(@RequestParam Long orderId, @RequestParam String userEmail,
+                              @RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
+        return orderService.orderRefund(orderId, bearerToken);
+    }
 }
