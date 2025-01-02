@@ -26,12 +26,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // CSRF 비활성화
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 사용하지 않음
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/order/**").permitAll() // 인증 없이 접근 가능 경로
-                        .anyRequest().authenticated() // 그 외의 모든 요청은 인증 필요
-                );
+                        .anyRequest().permitAll() // 모든 요청 허용
+                )
+                .csrf(csrf -> csrf.disable()) // CSRF 비활성화
+                .securityMatcher("/**") // 모든 경로에서 작동
+                .httpBasic(httpBasic -> httpBasic.disable()) // HTTP Basic 비활성화
+                .formLogin(formLogin -> formLogin.disable()) // 폼 로그인 비활성화
+                .logout(logout -> logout.disable()); // 로그아웃 비활성화
         return http.build();
     }
 
