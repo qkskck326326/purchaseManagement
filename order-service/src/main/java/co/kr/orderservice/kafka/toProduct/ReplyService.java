@@ -13,7 +13,21 @@ public class ReplyService {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @KafkaListener(topics = "product-quantity-decrease-reply", groupId = "product-group")
-    public void consumeReply(String message) throws Exception {
+    public void consumeDecreaseReplyReply(String message) throws Exception {
+        // 응답 메시지 파싱
+        Map<String, Object> response = objectMapper.readValue(message, Map.class);
+        String correlationId = (String) response.get("correlationId");
+        String reply = (String) response.get("response");
+
+        // 응답을 대기 중인 큐에 전달
+        replyQueues.computeIfPresent(correlationId, (key, queue) -> {
+            queue.offer(reply);
+            return queue;
+        });
+    }
+
+    @KafkaListener(topics = "product-quantity-increase-reply", groupId = "product-group")
+    public void consumeIncreaseReplyReply(String message) throws Exception {
         // 응답 메시지 파싱
         Map<String, Object> response = objectMapper.readValue(message, Map.class);
         String correlationId = (String) response.get("correlationId");
