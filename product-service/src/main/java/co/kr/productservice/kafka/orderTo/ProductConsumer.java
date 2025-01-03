@@ -31,7 +31,7 @@ public class ProductConsumer {
         String replyTopic = (String) request.get("replyTopic");
         String correlationId = (String) request.get("correlationId");
 
-        // 로직 처리 (예: 재고 감소)
+        // 재고 감소 처리
         String response = decreaseQuantity(orderItems);
 
         // 응답 메시지 구성
@@ -40,9 +40,7 @@ public class ProductConsumer {
         responsePayload.put("response", response);
 
         // 응답 전송
-        System.out.println("응답메세지 전송");
         kafkaTemplate.send(replyTopic, objectMapper.writeValueAsString(responsePayload));
-        System.out.println("응답메세지 전송 완료");
     }
     
     // 재고 감소 메소드
@@ -86,7 +84,7 @@ public class ProductConsumer {
         String replyTopic = (String) request.get("replyTopic");
         String correlationId = (String) request.get("correlationId");
 
-        // 로직 처리 (예: 재고 감소)
+        // 재고 증가 처리
         String response = increaseQuantity(orderItems);
 
         // 응답 메시지 구성
@@ -95,21 +93,19 @@ public class ProductConsumer {
         responsePayload.put("response", response);
 
         // 응답 전송
-        System.out.println("응답메세지 전송");
         kafkaTemplate.send(replyTopic, objectMapper.writeValueAsString(responsePayload));
-        System.out.println("응답메세지 전송 완료");
     }
     
     // 재고 증가 메소드
     public String increaseQuantity(List<OrderItemDto> orderItems) {
         Map<Long, Integer> productList = new HashMap<>();
         String result = ""; // 결과 저장
+        int updatedAll = 0;
         for (OrderItemDto orderItem : orderItems) {
-            if (!productRepository.existsById(orderItem.getProductId())) {
-                int updated = productRepository.increaseQuantity(orderItem.getProductId(), orderItem.getQuantity());
-                if (updated != 0) {
-                    productList.put(orderItem.getProductId(), orderItem.getQuantity());
-                }
+            int updated = productRepository.increaseQuantity(orderItem.getProductId(), orderItem.getQuantity());
+            updatedAll += updated;
+            if (updated != 0) {
+                productList.put(orderItem.getProductId(), orderItem.getQuantity());
             }
         }
 
