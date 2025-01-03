@@ -129,12 +129,20 @@ public class OrderService {
             String orderUser = order.getUserEmail();
 
             // 주문한 유저와 신청 유저의 email 이 다르다면
-            if (orderUser.equals(userEmail)) {
+            if (!orderUser.equals(userEmail)) {
                 return "주문취소 오류 : 잘못된 접근";
             }
 
-            if (order.getOrderState() != OrderStateEnum.Order_Completed){
+            if (order.getOrderState() == OrderStateEnum.Delivering){
                 return "주문취소 오류 : 이미 배송된 상품은 주문취소가 불가합니다.";
+            }
+
+            if (order.getOrderState() == OrderStateEnum.Order_Cancellation){
+                return "주문취소 오류 : 이미 취소된 주문입니다.";
+            }
+
+            if (order.getOrderState() == OrderStateEnum.Refunding){
+                return "주문취소 오류 : 이미 반품 처리된 주문입니다.";
             }
 
             List<OrderItemRequestDto> orderItemList = productOrderListRepository.findAllByOrderId(orderId)
@@ -145,6 +153,7 @@ public class OrderService {
             productProducer.increaseQuantity(orderId, orderItemList);
 
             order.setOrderState(OrderStateEnum.Order_Cancellation);
+            order.setUpdateAt(new Date());
             productOrderRepository.save(order);
             return "주문이 취소되었습니다.";
         } catch (Exception e) {
@@ -154,42 +163,60 @@ public class OrderService {
 
     // 반품 신청
     public String orderRefund(Long orderId, String bearerToken) {
-        String token = bearerToken.substring(7);
-        String userEmail = jwtTokenUtil.getUserEmailFromToken(token);
-        Optional<ProductOrderEntity> orderO = productOrderRepository.findById(orderId);
-        ProductOrderEntity order;
-        if (orderO.isPresent()) {
-            order = orderO.get();
-        }else {
-            return "반품신청 오류 : 주문 번호 오류";
+        try {
+            String token = bearerToken.substring(7);
+            String userEmail = jwtTokenUtil.getUserEmailFromToken(token);
+            Optional<ProductOrderEntity> orderO = productOrderRepository.findById(orderId);
+            ProductOrderEntity order;
+            if (orderO.isPresent()) {
+                order = orderO.get();
+            }else {
+                return "반품신청 오류 : 주문 번호 오류";
+            }
+
+            // 토큰의 유저 이름 꺼내기
+            String orderUser = jwtTokenUtil.getUserEmailFromToken(token);
+
+            // 주문한 유저와 신청 유저의 email 이 다르다면
+            if (!orderUser.equals(userEmail)) {
+                return "반품신청 오류 : 잘못된 접근";
+            }
+
+            if (order.getOrderState() == OrderStateEnum.Order_Cancellation){
+                return "주문취소 오류 : 이미 취소된 주문입니다.";
+            }
+
+            if (order.getOrderState() == OrderStateEnum.Refunding){
+                return "주문취소 오류 : 이미 반품 처리된 주문입니다.";
+            }
+
+            if (order.getOrderState() != OrderStateEnum.Delivery_Completed){
+                return "반품신청 오류 : 배송완료 되지 않은 상품은 반품이 불가능합니다.";
+            }
+
+            // 시간계산
+            LocalDateTime limitTime = order.getUpdateAt()
+                    .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+                    .plusDays(1);   // LocalDateTime 으로 변환 및 배송받은 날짜로부터 1일 추가
+            if (limitTime.isAfter(LocalDateTime.now())) {
+                return "반품신청 오류 : 배송완료 후 만 1일이 지난 상품은 환불이 불가능합니다.";
+            }
+
+            // 주문 리스트 가져오기
+            List<OrderItemRequestDto> itemList = productOrderListRepository.findAllByOrderId(order.getOrderId())
+                    .stream().map(entity -> new OrderItemRequestDto(entity))
+                    .toList();
+
+            productProducer.increaseQuantity(order.getOrderId(), itemList);
+
+            // 주문의 Status 변환
+            order.setOrderState(OrderStateEnum.Refunding);
+            order.setRefundAt(new Date());
+            order.setUpdateAt(new Date());
+            productOrderRepository.save(order);
+            return "반품신청이 완료되었습니다.";
+        } catch (Exception e) {
+            return "반품 신청중 오류 발생" + e.getMessage();
         }
-
-        // 토큰의 유저 이름 꺼내기
-        String orderUser = jwtTokenUtil.getUserEmailFromToken(token);
-
-        // 주문한 유저와 신청 유저의 email 이 다르다면
-        if (orderUser.equals(userEmail)) {
-            return "반품신청 오류 : 잘못된 접근";
-        }
-
-        // 상품을 받은지 1일 이상이 지났다면
-
-        if (order.getOrderState() != OrderStateEnum.Delivery_Completed){
-            return "반품신청 오류 : 배송완료 되지 않은 상품은 반품이 불가능합니다.";
-        }
-
-        // 시간계산
-        LocalDateTime limitTime = order.getUpdateAt()
-                .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
-                .plusDays(1);   // LocalDateTime 으로 변환 및 배송받은 날짜로부터 1일 추가
-        if (limitTime.isAfter(LocalDateTime.now())) {
-            return "반품신청 오류 : 배송완료 후 만 1일이 지난 상품은 환불이 불가능합니다.";
-        }
-
-        // 주문의 Status 변환
-        order.setOrderState(OrderStateEnum.Refunding);
-        order.setRefundAt(new Date());
-        productOrderRepository.save(order);
-        return "반품신청이 완료되었습니다.";
     }
 }
