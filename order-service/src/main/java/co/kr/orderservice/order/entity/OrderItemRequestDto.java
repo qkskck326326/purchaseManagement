@@ -1,8 +1,10 @@
 package co.kr.orderservice.order.entity;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class OrderItemRequestDto {
     Long productId;
     String productName;
