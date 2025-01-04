@@ -7,6 +7,11 @@ spring:
   web:
     resources:
       add-mappings: false # 정적 리소스 매핑 비활성화
+  data:
+    redis:
+      host: redis
+      port: 6379
+      password: redis6379
   cloud:
     gateway:
       discovery:
@@ -27,7 +32,14 @@ spring:
           uri: lb://ORDER-SERVICE
           predicates:
             - Path=/api/order/**
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          secret-key: bzeXpcSoWC6x5gq5c2gk7DaifjAofTWMpwxUWQYqT5qaLHNHlZWWYyKTXUKqjVo8
 
+jwt:
+  secret: bzeXpcSoWC6x5gq5c2gk7DaifjAofTWMpwxUWQYqT5qaLHNHlZWWYyKTXUKqjVo8
 
 eureka:
   client:
