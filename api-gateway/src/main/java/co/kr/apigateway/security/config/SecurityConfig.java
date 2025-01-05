@@ -27,6 +27,7 @@ public class SecurityConfig {
                 )
                 .addFilterBefore((exchange, chain) -> {
                     String path = exchange.getRequest().getURI().getPath();
+                    // 이부분에 필터를 적용하지 않을 api 요청 추가
                     if (path.startsWith("/api/user/") || path.startsWith("/api/order/") || path.startsWith("/api/product/")) {
                         return chain.filter(exchange); // 필터 제외
                     }
