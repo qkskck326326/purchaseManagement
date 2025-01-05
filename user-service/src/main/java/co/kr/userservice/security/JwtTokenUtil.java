@@ -29,7 +29,7 @@ public class JwtTokenUtil {
     public String createToken(Authentication authentication) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + 60 * 60 * 1000); // 1시간 ( 분 * 초 * ms )
+        Date expiryDate = new Date(now.getTime() + 12 * 60 * 60 * 1000); // 12시간 (시간 * 분 * 초 * ms )
 
         return Jwts.builder()
                 .setSubject(userDetails.getEmail())

@@ -33,7 +33,7 @@ public class RedisUtil {
     }
 
     public void saveLoginInfo(String email, String ip, String token){
-        redisTemplate.opsForValue().set(email, token, 60, TimeUnit.MINUTES); // 60분 TTL 설정
+        redisTemplate.opsForValue().set(email, token, 720, TimeUnit.MINUTES); // 720분 TTL 설정( 12시간 임시 )
 
         String redisKey = String.format("user:%s", email); // email을 키로 사용
         String fieldKey = String.format("ip:%s", DigestUtils.sha256Hex(ip));
@@ -42,7 +42,7 @@ public class RedisUtil {
         redisTemplate.opsForHash().put(redisKey, fieldKey, token);
 
         // TTL 설정 (선택적, email 키에 TTL 설정)
-        redisTemplate.expire(redisKey, 30, TimeUnit.MINUTES);
+        redisTemplate.expire(redisKey, 720, TimeUnit.MINUTES);
     }
 
     public void logoutHere(String email, String ip) {
