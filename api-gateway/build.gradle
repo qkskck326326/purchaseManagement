@@ -31,6 +31,24 @@ dependencies {
 
     // Actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // JSON 처리 관련 의존성
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2' // JSON 직렬화 및 역직렬화 지원
+
+    // JWT (JSON Web Token) 처리 관련 의존성
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5' // JWT API 기본 기능 제공
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5' // JWT 구현체 제공
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5' // JWT와 Jackson 통합 지원
+
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 }
 
 dependencyManagement {
