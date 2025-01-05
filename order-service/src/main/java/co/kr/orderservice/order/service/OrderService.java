@@ -5,7 +5,7 @@ import co.kr.orderservice.feign.toProduct.ProductResponseDto;
 import co.kr.orderservice.kafka.toProduct.ProductProducer;
 import co.kr.orderservice.order.entity.*;
 
-import co.kr.orderservice.order.repository.ProductOrderListRepository;
+import co.kr.orderservice.order.repository.ProductOrderItemRepository;
 import co.kr.orderservice.order.repository.ProductOrderRepository;
 import co.kr.orderservice.order.repository.WishListRepository;
 import co.kr.orderservice.order.util.JwtTokenUtil;
@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -26,20 +25,22 @@ public class OrderService {
     private final WishListRepository wishListRepository;
     private final ProductClient productClient;
     private final ProductOrderRepository productOrderRepository;
-    private final ProductOrderListRepository productOrderListRepository;
+    private final ProductOrderItemRepository productOrderItemRepository;
     private final JwtTokenUtil jwtTokenUtil;
     private final ProductProducer productProducer;
 
-    // 장바구니 리스트 가져오기
-    public List<WishListResponseDto> getWishList(String userEmail) {
+    // 위시 리스트 가져오기
+    public List<WishListResponseDto> getWishList(String bearerToken) {
+        String userEmail = jwtTokenUtil.getUserEmailFromToken(bearerToken.substring(7));
         List<WishListEntity> list = wishListRepository.findByUserEmail(userEmail);
         return list.stream()
                 .map(WishListResponseDto::new)
                 .toList();
     }
 
-    // 장바구니에 상품 추가
-    public String addWishList(Long productId, String userEmail, int quantity) {
+    // 위시리스트에 상품 추가
+    public String addWishList(Long productId, String bearerToken, int quantity) {
+        String userEmail = jwtTokenUtil.getUserEmailFromToken(bearerToken.substring(7));
         if (wishListRepository.existsByProductIdAndUserEmail(productId, userEmail)){
             return "이미 장바구니에 추가한 상품입니다";
         }else {
@@ -53,9 +54,17 @@ public class OrderService {
 
         }
     }
-    
-    // 장바구니 수량 변경
-    public String editQuantityWishList(Long wishListId, int quantity) {
+
+    // 위시리스트 수량 수정
+    public String editQuantityWishList(Long wishListId, int quantity, String bearerToken) {
+        String token = bearerToken.substring(7);
+        String userEmail = jwtTokenUtil.getUserEmailFromToken(token);
+        
+        // wishList 존재여부 확인
+        if (wishListRepository.existsByProductIdAndUserEmail(wishListId, userEmail)) {
+            return "장바구니 수량 변경 오류 : 해당 상품이 장바구니에 존재하지 않습니다.";
+        }
+        
         return wishListRepository.findById(wishListId)
                 .map(wishList -> {
                     wishList.setQuantity(quantity);
@@ -64,18 +73,21 @@ public class OrderService {
                 })
                 .orElse("해당 상품이 존재하지 않습니다.");
     }
-    
-    // 장바구니에서 상품 삭제
-    public String deleteQuantityWishList(Long wishListId) {
+
+    // 위시리스트 삭제
+    public String deleteQuantityWishList(Long wishListId, String bearerToken) {
         try {
-            // 존재 확인
-            if(wishListRepository.existsById(wishListId)) {
-                return "위시리스트에 해당 상품이 없습니다.";
+            String token = bearerToken.substring(7);
+            String userEmail = jwtTokenUtil.getUserEmailFromToken(token);
+
+            // wishList 존재여부 확인
+            if (wishListRepository.existsByProductIdAndUserEmail(wishListId, userEmail)) {
+                return "장바구니 삭제 오류 : 해당 상품이 장바구니에 존재하지 않습니다.";
             }
             // 삭제
             wishListRepository.deleteById(wishListId);
         } catch (Exception e) {
-            return "삭제중 오류가 발생하였습니다.";
+            return "삭제중 오류가 발생하였습니다 : " + e.getMessage();
         }
         return "삭제가 완료되었습니다.";
     }
@@ -101,7 +113,7 @@ public class OrderService {
                         .toList();
                 System.out.println("주문 갯수 : " + orderList.size());
 
-                productOrderListRepository.saveAll(orderList);
+                productOrderItemRepository.saveAll(orderList);
 
                 return "주문 완료";
             }
@@ -145,7 +157,7 @@ public class OrderService {
                 return "주문취소 오류 : 이미 반품 처리된 주문입니다.";
             }
 
-            List<OrderItemRequestDto> orderItemList = productOrderListRepository.findAllByOrderId(orderId)
+            List<OrderItemRequestDto> orderItemList = productOrderItemRepository.findAllByOrderId(orderId)
                     .stream().map(entity -> new OrderItemRequestDto(entity))
                     .toList();
 
@@ -203,7 +215,7 @@ public class OrderService {
             }
 
             // 주문 리스트 가져오기
-            List<OrderItemRequestDto> itemList = productOrderListRepository.findAllByOrderId(order.getOrderId())
+            List<OrderItemRequestDto> itemList = productOrderItemRepository.findAllByOrderId(order.getOrderId())
                     .stream().map(entity -> new OrderItemRequestDto(entity))
                     .toList();
 
@@ -219,4 +231,5 @@ public class OrderService {
             return "반품 신청중 오류 발생" + e.getMessage();
         }
     }
+
 }

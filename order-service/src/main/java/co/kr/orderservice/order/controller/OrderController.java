@@ -16,47 +16,47 @@ import java.util.List;
 public class OrderController {
     private final OrderService orderService;
 
-    // 위시리스트에 해당 상품 추가  /// 편집점 - 추후 토큰에서 userEmail 가져오는 형식으로 변경해야됨
-    @PostMapping("/wishList/{productId}")
-    public String addWishList(@PathVariable Long productId, @RequestParam String userEmail, @RequestParam int quantity) {
-        return orderService.addWishList(productId, userEmail, quantity);
-    }
-
-    // 위시리스트 보기  /// 편집점 - 추후 토큰에서 userEmail 가져오는 형식으로 변경해야됨
+    // 위시리스트 보기
     @GetMapping("/wishList")
-    public List<WishListResponseDto> getWishList(@RequestParam String userEmail) {
-        return orderService.getWishList(userEmail);
+    public List<WishListResponseDto> getWishList(@RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
+        return orderService.getWishList(bearerToken);
     }
 
-    // 위시리스트 수정
+    // 위시리스트에 해당 상품 추가
+    @PostMapping("/wishList/{productId}")
+    public String addWishList(@PathVariable Long productId, @RequestParam int quantity, @RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
+        return orderService.addWishList(productId, bearerToken, quantity);
+    }
+
+    // 위시리스트 수량 수정
     @GetMapping("/wishList/edit/quantity")
-    public String editWishListQuantity(@RequestParam Long wishListId, @RequestParam int quantity) {
-        return orderService.editQuantityWishList(wishListId, quantity);
+    public String editWishListQuantity(@RequestParam Long wishListId, @RequestParam int quantity, @RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
+        return orderService.editQuantityWishList(wishListId, quantity, bearerToken);
     }
 
     // 위시리스트 삭제
     @GetMapping("/wishList/delete/{wishListId}")
-    public String deleteWishListQuantity(@PathVariable Long wishListId) {
-        return orderService.deleteQuantityWishList(wishListId);
+    public String deleteWishListQuantity(@PathVariable Long wishListId, @RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
+        return orderService.deleteQuantityWishList(wishListId, bearerToken);
     }
 
     // 상품 주문
     @PostMapping("/products")
-    public String orderProducts(@RequestBody List<OrderItemRequestDto> orderList, @RequestParam String userEmail,
+    public String orderProducts(@RequestBody List<OrderItemRequestDto> orderList,
                                 @RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
         return orderService.orderProducts(orderList, bearerToken);
     }
 
     // 주문 취소
     @PostMapping("/cancellation")
-    public String orderCancellation(@RequestParam Long orderId, @RequestParam String userEmail,
+    public String orderCancellation(@RequestParam Long orderId,
                                     @RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
         return orderService.OrderCancellation(orderId, bearerToken);
     }
 
     // 반품신청
     @PostMapping("/refund")
-    public String orderRefund(@RequestParam Long orderId, @RequestParam String userEmail,
+    public String orderRefund(@RequestParam Long orderId,
                               @RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
         return orderService.orderRefund(orderId, bearerToken);
     }
