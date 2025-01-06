@@ -28,8 +28,8 @@ public class UserController {
 
     // 이메일 인증용 API
     @GetMapping("/verify")
-    public void verifyUser(@RequestParam String code, @RequestParam String email) {
-        userService.verifyEmail(code, email);
+    public String verifyUser(@RequestParam String code, @RequestParam String email) {
+        return userService.verifyEmail(code, email);
     }
 
     // 비밀번호 변경

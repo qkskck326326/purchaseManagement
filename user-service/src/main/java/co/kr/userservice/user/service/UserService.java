@@ -35,12 +35,13 @@ public class UserService {
         }
     }
 
-    public void verifyEmail(String code, String email) {
+    public String verifyEmail(String code, String email) {
         if(emailVerificationRepository.existsByEmailAndVerificationCode(email, code)){
             System.out.println("인증완료");
             UserEntity user = userRepository.findByEmail(email);
             user.setVerify(true);
             userRepository.save(user);
+            return "인증완료";
         }
     }
 
