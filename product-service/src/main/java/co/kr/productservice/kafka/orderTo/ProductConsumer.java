@@ -40,6 +40,7 @@ public class ProductConsumer {
         responsePayload.put("response", response);
 
         // 응답 전송
+        System.out.println("응답 topic : " + replyTopic);
         kafkaTemplate.send(replyTopic, objectMapper.writeValueAsString(responsePayload));
     }
     
@@ -47,24 +48,44 @@ public class ProductConsumer {
     private String decreaseQuantity(List<OrderItemDto> orderItems) {
         Map<Long, Integer> productList = new HashMap<>(); // 재고 감소시킨 상품 저장
         String result = ""; // 결과 저장
+        int sum = 0;
         for (OrderItemDto orderItem : orderItems) { // 각 주문상품
-            if (!productRepository.existsById(orderItem.getProductId())) {
+            Optional<ProductEntity> productO = productRepository.findById(orderItem.getProductId());
+            ProductEntity product;
+            if (!productO.isPresent()) {
                 result = "상품: " + orderItem.getProductName() + " 가 존재하지 않습니다.";
                 break;
+            }else {
+                product = productO.get();
             }
+
+            if(product.getBuyableTime() != null){
+                // 상품 구매 가능 시간 확인
+                System.out.println("product.getBuyableTime() - 구매가능 시간 = " + product.getBuyableTime());
+                if (product.getBuyableTime().after(new Date())) {
+                    result = "상품: " + orderItem.getProductName() + " 가 아직 구매 가능하지 않습니다.";
+                    break;
+                }
+            }
+
+            // 총 가격 계산
+            sum += product.getPrice() * orderItem.getQuantity();
+            // 재고 감소 및 감소되었는지 카운트
             int updated = productRepository.decreaseQuantity(orderItem.getProductId(), orderItem.getQuantity());
             if (updated == 0) {
                 result = "상품: " + orderItem.getProductName() + "재고부족";
                 break;
             }
+            // 재고를 감소시킨 상품 저장
             productList.put(orderItem.getProductId(), orderItem.getQuantity());
         }
+        // 재고 감소가 불가능한 ( 미존재 OR 재고부족 ) 상품이 있다면 재고 복구
         if (orderItems.size() > productList.size()){
             for (Map.Entry<Long, Integer> entry : productList.entrySet()) {
                 productRepository.increaseQuantity(entry.getKey(), entry.getValue());
             }
         } else if (orderItems.size() == productList.size()) {
-            result = "null";
+            result = "null" + sum;
         }
 
         return result;

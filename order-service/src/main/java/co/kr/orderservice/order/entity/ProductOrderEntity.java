@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -25,6 +26,9 @@ public class ProductOrderEntity {
 
     @Column(name = "order_state")
     private OrderStateEnum orderState = OrderStateEnum.Order_Completed;
+
+    @Column(name = "total_price")
+    private int totalPrice;
 
     @Column(name = "order_at", nullable = false)
     @Temporal(TemporalType.DATE)

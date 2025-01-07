@@ -26,6 +26,12 @@ public class ProductEntity {
     @Column(name = "product_quantity")
     private int productQuantity;
 
+    @Column(name = "price")
+    private int price;
+
+    @Column(name = "buyable_time")
+    private Date buyableTime;
+
     @Column(name = "like_count")
     private int likeCount;
 

@@ -2,6 +2,7 @@ package co.kr.orderservice.order.controller;
 
 
 import co.kr.orderservice.order.entity.OrderItemRequestDto;
+import co.kr.orderservice.order.entity.ProductOrderEntity;
 import co.kr.orderservice.order.entity.WishListResponseDto;
 import co.kr.orderservice.order.service.OrderService;
 import lombok.AllArgsConstructor;
@@ -60,4 +61,22 @@ public class OrderController {
                               @RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
         return orderService.orderRefund(orderId, bearerToken);
     }
+
+    //////////////////////////////////
+
+    // 주문 정보 목록 API
+    @GetMapping("/show")
+    public List<ProductOrderEntity> showOrderList(@RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
+        return orderService.showOrderList(bearerToken);
+    }
+
+    // 주문 정보 API
+    @GetMapping("/show/{orderId}")
+    public ProductOrderEntity showOrder(@PathVariable Long orderId,
+                                        @RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
+        return orderService.showOrder(orderId, bearerToken);
+    }
+
+
+
 }

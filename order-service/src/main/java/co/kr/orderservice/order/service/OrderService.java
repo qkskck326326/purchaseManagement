@@ -104,7 +104,7 @@ public class OrderService {
             // 재고처리 및 확인 결과 반환
             String result = productProducer.decreaseQuantity(order.getOrderId(), orderListRequestDto);
             System.out.println("kafka 메세지 reply 결과" + result);
-            if (!result.equals("null")){
+            if (!result.startsWith("null")){
                 return result;
             }else {
                 // 주문 리스트로 변환 및 저장
@@ -112,10 +112,11 @@ public class OrderService {
                         .stream().map(dto -> new ProductOrderItemEntity(order.getOrderId(), dto))
                         .toList();
                 System.out.println("주문 갯수 : " + orderList.size());
-
+                System.out.println("총 가격" + Integer.parseInt(result.substring(4)));
                 productOrderItemRepository.saveAll(orderList);
-
-                return "주문 완료";
+                order.setTotalPrice(Integer.parseInt(result.substring(4)));
+                productOrderRepository.save(order);
+                return "주문이 대기중입니다.";
             }
         }catch (Exception e) {
             System.out.println("주문 처리중 에러 : " + e.getMessage());
@@ -230,6 +231,18 @@ public class OrderService {
         } catch (Exception e) {
             return "반품 신청중 오류 발생" + e.getMessage();
         }
+    }
+
+    // 내 주문 정보 리스트 api
+    public List<ProductOrderEntity> showOrderList(String bearerToken) {
+        String userEmail = jwtTokenUtil.getUserEmailFromToken(bearerToken.substring(7));
+        return productOrderRepository.findAllByUserEmail(userEmail);
+    }
+
+    // 내 주문 정보 API
+    public ProductOrderEntity showOrder(Long orderId, String bearerToken) {
+        String userEmail = jwtTokenUtil.getUserEmailFromToken(bearerToken.substring(7));
+        return productOrderRepository.findByOrderIdAndUserEmail(orderId, userEmail);
     }
 
 }
