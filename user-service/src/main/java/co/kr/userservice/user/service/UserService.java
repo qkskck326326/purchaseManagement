@@ -42,6 +42,8 @@ public class UserService {
             user.setVerify(true);
             userRepository.save(user);
             return "인증완료";
+        }else {
+            return "잘못된 접근입니다.";
         }
     }
 
