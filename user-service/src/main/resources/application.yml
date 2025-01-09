@@ -11,7 +11,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   data:
     redis:
-      host: redis
+      host: redis-user
       port: 6379
       password: redis6379
   mail:
@@ -29,7 +29,7 @@ spring:
   host-name: localhost
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
 
 jwt:
   secret: bzeXpcSoWC6x5gq5c2gk7DaifjAofTWMpwxUWQYqT5qaLHNHlZWWYyKTXUKqjVo8
