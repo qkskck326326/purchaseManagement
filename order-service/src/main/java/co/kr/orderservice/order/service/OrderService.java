@@ -157,7 +157,7 @@ public class OrderService {
             if (order.getOrderState() == OrderStateEnum.Refunding){
                 return "주문취소 오류 : 이미 반품 처리된 주문입니다.";
             }
-
+            // 편집점 = List가 제대로 전달되는지 확인
             List<OrderItemRequestDto> orderItemList = productOrderItemRepository.findAllByOrderId(orderId)
                     .stream().map(entity -> new OrderItemRequestDto(entity))
                     .toList();
