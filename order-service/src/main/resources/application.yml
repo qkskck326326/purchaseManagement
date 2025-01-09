@@ -12,6 +12,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
+  data:
+    redis:
+      host: redis-product
+      port: 6380
+      password: redis6379
   kafka:
     bootstrap-servers: kafka:9092  # docker-compose에서 정의한 Kafka 브로커 주소
     consumer:
