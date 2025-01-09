@@ -41,6 +41,8 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
     ports:
       - "3306:3306"
+    volumes:
+      - purchasemanagement_user_db_data:/var/lib/mysql
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h user_db -u root -p${MYSQL_ROOT_PASSWORD}"]
       interval: 10s
@@ -54,6 +56,8 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
     ports:
       - "3307:3306"
+    volumes:
+      - purchasemanagement_product_db_data:/var/lib/mysql
     healthcheck:
       test: [ "CMD-SHELL", "mysqladmin ping -h product_db -u root -p${MYSQL_ROOT_PASSWORD}" ]
       interval: 10s
@@ -67,12 +71,14 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
     ports:
       - "3308:3306"
+    volumes:
+      - purchasemanagement_order_db_data:/var/lib/mysql
     healthcheck:
       test: [ "CMD-SHELL", "mysqladmin ping -h order_db -u root -p${MYSQL_ROOT_PASSWORD}" ]
       interval: 10s
       retries: 10
 
-  redis:
+  redis-user:
     image: redis:latest
     container_name: redis
     environment:
@@ -82,6 +88,19 @@ services:
     command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
     healthcheck:
       test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      retries: 10
+
+  redis-product:
+    image: redis:latest
+    container_name: redis-product
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    ports:
+      - "6380:6380"
+    command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}" ]
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping" ]
       interval: 10s
       retries: 10
 
@@ -111,7 +130,7 @@ services:
     depends_on:
       user_db:
         condition: service_healthy
-      redis:
+      redis-user:
         condition: service_healthy
     ports:
       - "8081:8081"
@@ -126,6 +145,8 @@ services:
     depends_on:
       product_db:
         condition: service_healthy
+      redis-product:
+        condition: service_healthy
     ports:
       - "8082:8082"
     environment:
@@ -139,6 +160,8 @@ services:
     depends_on:
       order_db:
         condition: service_healthy
+      redis-product:
+        condition: service_healthy
     ports:
       - "8083:8083"
     environment:
@@ -148,6 +171,9 @@ services:
 
 volumes:
   kafka-data:
+  purchasemanagement_user_db_data:
+  purchasemanagement_product_db_data:
+  purchasemanagement_order_db_data:
 
 networks:
   default:
