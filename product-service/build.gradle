@@ -45,6 +45,8 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5' // JWT와 Jackson 통합 지원
     // Kafka
     implementation 'org.springframework.kafka:spring-kafka'
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 }
 
 dependencyManagement {
