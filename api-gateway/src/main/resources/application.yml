@@ -9,7 +9,7 @@ spring:
       add-mappings: false # 정적 리소스 매핑 비활성화
   data:
     redis:
-      host: redis
+      host: redis-user
       port: 6379
       password: redis6379
   cloud:
