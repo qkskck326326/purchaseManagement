@@ -27,16 +27,9 @@ public class OrderService {
     private final ProductOrderListRepository productOrderListRepository;
     private final JwtTokenUtil jwtTokenUtil;
 
-    // 장바구니 리스트 가져오기
-    public List<WishListResponseDto> getWishList(String userEmail) {
-        List<WishListEntity> list = wishListRepository.findByUserEmail(userEmail);
-        return list.stream()
-                .map(WishListResponseDto::new)
-                .toList();
-    }
-
     // 장바구니에 상품 추가
-    public String addWishList(Long productId, String userEmail, int quantity) {
+    public String addWishList(Long productId, int quantity, String bearerToken) {
+        String userEmail = jwtTokenUtil.getUserEmailFromToken(bearerToken.substring(7));
         if (wishListRepository.existsByProductIdAndUserEmail(productId, userEmail)){
             return "이미 장바구니에 추가한 상품입니다";
         }else {
@@ -51,7 +44,15 @@ public class OrderService {
 
         }
     }
-    
+
+    // 장바구니 리스트 가져오기
+    public List<WishListResponseDto> getWishList(String userEmail) {
+        List<WishListEntity> list = wishListRepository.findByUserEmail(userEmail);
+        return list.stream()
+                .map(WishListResponseDto::new)
+                .toList();
+    }
+
     // 장바구니 수량 변경
     public String editQuantityWishList(Long wishListId, int quantity) {
         return wishListRepository.findById(wishListId)
