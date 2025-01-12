@@ -9,6 +9,7 @@ import co.kr.orderservice.order.repository.ProductOrderItemRepository;
 import co.kr.orderservice.order.repository.ProductOrderRepository;
 import co.kr.orderservice.order.repository.WishListRepository;
 import co.kr.orderservice.order.util.JwtTokenUtil;
+import co.kr.orderservice.order.util.RedisUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,7 @@ public class OrderService {
     private final ProductOrderRepository productOrderRepository;
     private final ProductOrderItemRepository productOrderItemRepository;
     private final JwtTokenUtil jwtTokenUtil;
+    private final RedisUtil redisUtil;
     private final ProductProducer productProducer;
 
     // 위시 리스트 가져오기
@@ -101,22 +103,28 @@ public class OrderService {
             ProductOrderEntity order = new ProductOrderEntity(userEmail); // 꺼낸 이메일로 주문서 만들기
             productOrderRepository.save(order); // 주문서 저장
 
-            // 재고처리 및 확인 결과 반환
-            String result = productProducer.decreaseQuantity(order.getOrderId(), orderListRequestDto);
-            System.out.println("kafka 메세지 reply 결과" + result);
-            if (!result.startsWith("null")){
-                return result;
+            // Redis - 상품갯수 확인 및 감소 - 처리에 성공하면 총 가격, 실패한다면 null 이 출력됨
+            // [0] = 실패시 실패사유 성공시 null,
+            // [1] = 성공시 총 가격
+            Object[] redisResult = redisUtil.decreaseProductQuantityList(orderListRequestDto);
+
+
+            if (redisResult[0] != null){ // 갯수 확인 및 감소 성공여부
+                return (String) redisResult[0];
             }else {
                 // 주문 리스트로 변환 및 저장
                 List<ProductOrderItemEntity> orderList = orderListRequestDto
                         .stream().map(dto -> new ProductOrderItemEntity(order.getOrderId(), dto))
                         .toList();
                 System.out.println("주문 갯수 : " + orderList.size());
-                System.out.println("총 가격" + Integer.parseInt(result.substring(4)));
+                System.out.println("총 가격" + (Integer)redisResult[1]);
                 productOrderItemRepository.saveAll(orderList);
-                order.setTotalPrice(Integer.parseInt(result.substring(4)));
+                order.setTotalPrice((Integer) redisResult[1]); // 총 가격 저장
                 productOrderRepository.save(order);
-                return "주문이 대기중입니다.";
+
+                // kafka 메세지 전송 - 재고감소 요청
+                productProducer.decreaseQuantity(order.getOrderId(), orderListRequestDto);
+                return "결제 진입.";
             }
         }catch (Exception e) {
             System.out.println("주문 처리중 에러 : " + e.getMessage());
@@ -161,14 +169,22 @@ public class OrderService {
             List<OrderItemRequestDto> orderItemList = productOrderItemRepository.findAllByOrderId(orderId)
                     .stream().map(entity -> new OrderItemRequestDto(entity))
                     .toList();
-
-            // 재고처리 요청
-            productProducer.increaseQuantity(orderId, orderItemList);
-
-            order.setOrderState(OrderStateEnum.Order_Cancellation);
-            order.setUpdateAt(new Date());
-            productOrderRepository.save(order);
-            return "주문이 취소되었습니다.";
+            
+            // redis 에서 상품 재고 증가 처리
+            String redisResult = redisUtil.increaseProductQuantityList(orderItemList);
+            if (redisResult.equals("success")){
+                // kafka 메세지 전송 - 재고증가 요청 - 수정점
+                productProducer.increaseQuantity(orderId, orderItemList);
+                // 주문의 상태 - 주문 취소됨으로 변경
+                order.setOrderState(OrderStateEnum.Order_Cancellation);
+                order.setUpdateAt(new Date());
+                productOrderRepository.save(order);
+                return "주문이 취소되었습니다.";
+            }else {
+                return  "주문 취소중 오류가 발생하였습니다" + redisResult;
+            }
+            
+            
         } catch (Exception e) {
             return "주문 취소 오류 : " + e.getMessage();
         }
@@ -220,14 +236,21 @@ public class OrderService {
                     .stream().map(entity -> new OrderItemRequestDto(entity))
                     .toList();
 
-            productProducer.increaseQuantity(order.getOrderId(), itemList);
+            // redis 에서 상품 재고 증가 처리
+            String redisResult = redisUtil.increaseProductQuantityList(itemList);
+            if (redisResult.equals("success")){
+                // kafka 메세지 전송 - 재고증가 요청 - 수정점
+                productProducer.increaseQuantity(orderId, itemList);
+                // 주문의 Status 변환 - 반품됨
+                order.setOrderState(OrderStateEnum.Refunding);
+                order.setRefundAt(new Date());
+                order.setUpdateAt(new Date());
+                productOrderRepository.save(order);
+                return "반품신청이 완료되었습니다.";
+            }else {
+                return  "반품 취소 요청 중 오류가 발생하였습니다" + redisResult;
+            }
 
-            // 주문의 Status 변환
-            order.setOrderState(OrderStateEnum.Refunding);
-            order.setRefundAt(new Date());
-            order.setUpdateAt(new Date());
-            productOrderRepository.save(order);
-            return "반품신청이 완료되었습니다.";
         } catch (Exception e) {
             return "반품 신청중 오류 발생" + e.getMessage();
         }
