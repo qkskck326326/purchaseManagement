@@ -42,7 +42,7 @@ public class ProductService {
             Optional<ProductEntity> productO = productRepository.findById(productId);
             if (productO.isPresent()){ // DB에 존재한다면 레디스에 해당값을 저장하고 리턴함
                 ProductEntity product = productO.get();
-                redisUtil.saveProductQuantity(product.getProductId(), product.getProductQuantity());
+                redisUtil.saveProduct(product.getProductId(), product.getProductQuantity(), product.getPrice());
                 return product.getProductQuantity();
             }else { // 둘 다 에서 없는 경우에는 없는 상품이기 때문에 에러숫자로 -1 을 리턴함
                 return -1;
@@ -51,4 +51,22 @@ public class ProductService {
             return quantity;
         }
     }
+
+    public int getProductPrice(Long productId) {
+        // 레디스에서 가져오기
+        Integer price = redisUtil.getProductPrice(productId);
+        if (price == null){ // 레디스에 저장되어 있지 않다면 DB 에서 가져옴
+            Optional<ProductEntity> productO = productRepository.findById(productId);
+            if (productO.isPresent()){ // DB에 존재한다면 레디스에 해당값을 저장하고 리턴함
+                ProductEntity product = productO.get();
+                redisUtil.saveProduct(product.getProductId(), product.getProductQuantity(), product.getPrice());
+                return product.getProductQuantity();
+            }else { // 둘 다 에서 없는 경우에는 없는 상품이기 때문에 에러숫자로 -1 을 리턴함
+                return -1;
+            }
+        }else { // 레디스에 저장되어 있다면 바로 리턴
+            return price;
+        }
+    }
+
 }
