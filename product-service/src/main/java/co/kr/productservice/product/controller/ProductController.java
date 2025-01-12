@@ -34,4 +34,9 @@ public class ProductController {
         return productService.getProductQuantity(productId);
     }
 
+    @GetMapping("/price/{productId}")
+    public int getPrice(@PathVariable Long productId) {
+        return productService.getProductPrice(productId);
+    }
+
 }
