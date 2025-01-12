@@ -2,6 +2,7 @@ package co.kr.orderservice.order.entity;
 
 public enum OrderStateEnum {
     Order_Completed,
+    Order_Ready,
     Delivering,
     Delivery_Completed,
     Order_Cancellation,

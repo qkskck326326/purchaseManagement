@@ -25,7 +25,7 @@ public class ProductOrderEntity {
     private String userEmail;
 
     @Column(name = "order_state")
-    private OrderStateEnum orderState = OrderStateEnum.Order_Completed;
+    private OrderStateEnum orderState = OrderStateEnum.Order_Ready;
 
     @Column(name = "total_price")
     private int totalPrice;
