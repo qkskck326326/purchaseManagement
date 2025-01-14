@@ -132,6 +132,22 @@ public class OrderService {
         }
     }
 
+    // 주문완료
+    public String orderProductsPayed(Long orderId, String bearerToken) {
+        String result;
+        String userEmail = jwtTokenUtil.getUserEmailFromToken(bearerToken.substring(7));
+        Optional<ProductOrderEntity> orderO = productOrderRepository.findByOrderIdAndUserEmail(orderId, userEmail);
+        ProductOrderEntity order;
+        if (orderO.isPresent()){
+            order = orderO.get();
+            order.setOrderState(OrderStateEnum.Order_Completed);
+            result = "주문이 완료되었습니다.";
+        }else {
+            result = "주문오류 : " + orderId + "가 유효하지 않습니다.";
+        }
+        return result;
+    }
+
     // 주문 취소
     @Transactional
     public String OrderCancellation(Long orderId, String bearerToken) {
@@ -265,7 +281,8 @@ public class OrderService {
     // 내 주문 정보 API
     public ProductOrderEntity showOrder(Long orderId, String bearerToken) {
         String userEmail = jwtTokenUtil.getUserEmailFromToken(bearerToken.substring(7));
-        return productOrderRepository.findByOrderIdAndUserEmail(orderId, userEmail);
+        return productOrderRepository.findByOrderIdAndUserEmail(orderId, userEmail)
+                .orElse(null);
     }
 
 }

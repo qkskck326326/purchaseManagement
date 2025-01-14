@@ -48,6 +48,12 @@ public class OrderController {
         return orderService.orderProducts(orderList, bearerToken);
     }
 
+    // 주문 결제 완료 - 수정점 - 추수 결제 여부가 확인되는 인증코드등 추가 필요할 수 있음
+    @PostMapping("/products/payed/{orderId}")
+    public String orderProductsPayed(@PathVariable Long orderId, @RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken){
+        return orderService.orderProductsPayed(orderId, bearerToken);
+    }
+
     // 주문 취소
     @PostMapping("/cancellation")
     public String orderCancellation(@RequestParam Long orderId,
