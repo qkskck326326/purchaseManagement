@@ -20,7 +20,8 @@ public class LoginController {
     public String login(@RequestBody Map<String, String> loginData, HttpServletRequest request) {
         return loginService.login(loginData, request);
     }
-
+    
+    // 로그아웃
     @PostMapping("/logout")
     public String logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String Authorization, HttpServletRequest request) {
         String token = null;
@@ -33,7 +34,8 @@ public class LoginController {
 
         return "로그아웃 완료";
     }
-
+    
+    // 모든 곳에서 로그아웃
     @PostMapping("/logoutAll")
     public String logoutAll(@RequestHeader(HttpHeaders.AUTHORIZATION) String Authorization) {
         String token = null;
