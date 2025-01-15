@@ -25,8 +25,9 @@ public class OrderController {
 
     // 위시리스트에 해당 상품 추가
     @PostMapping("/wishList/{productId}")
-    public String addWishList(@PathVariable Long productId, @RequestParam int quantity, @RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
-        return orderService.addWishList(productId, bearerToken, quantity);
+    public String addWishList(@PathVariable Long productId, @RequestParam int quantity, @RequestParam String productName,
+                              @RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken) {
+        return orderService.addWishList(productId, productName, bearerToken, quantity);
     }
 
     // 위시리스트 수량 수정

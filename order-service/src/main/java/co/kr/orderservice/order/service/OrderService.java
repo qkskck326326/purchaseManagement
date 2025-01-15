@@ -1,7 +1,6 @@
 package co.kr.orderservice.order.service;
 
-import co.kr.orderservice.feign.toProduct.ProductClient;
-import co.kr.orderservice.feign.toProduct.ProductResponseDto;
+import co.kr.orderservice.order.entity.ProductResponseDto;
 import co.kr.orderservice.kafka.toProduct.ProductProducer;
 import co.kr.orderservice.order.entity.*;
 
@@ -24,7 +23,6 @@ import java.util.Optional;
 @AllArgsConstructor
 public class OrderService {
     private final WishListRepository wishListRepository;
-    private final ProductClient productClient;
     private final ProductOrderRepository productOrderRepository;
     private final ProductOrderItemRepository productOrderItemRepository;
     private final JwtTokenUtil jwtTokenUtil;
@@ -41,13 +39,13 @@ public class OrderService {
     }
 
     // 위시리스트에 상품 추가
-    public String addWishList(Long productId, String bearerToken, int quantity) {
+    public String addWishList(Long productId, String productName, String bearerToken, int quantity) {
         String userEmail = jwtTokenUtil.getUserEmailFromToken(bearerToken.substring(7));
         if (wishListRepository.existsByProductIdAndUserEmail(productId, userEmail)){
             return "이미 장바구니에 추가한 상품입니다";
         }else {
-            ProductResponseDto productResponseDto = productClient.getProduct(productId);
-            if (productResponseDto.getProductName() != null){
+            ProductResponseDto productResponseDto = new ProductResponseDto(productId, productName);
+            if (redisUtil.existProduct(productId)) {
                 wishListRepository.save(new WishListEntity(userEmail, productResponseDto, quantity));
                 return "장바구니에 해당 상품이 추가되었습니다.";
             }else {

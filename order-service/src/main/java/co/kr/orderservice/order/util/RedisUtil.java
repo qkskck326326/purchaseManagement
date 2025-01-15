@@ -43,6 +43,14 @@ public class RedisUtil {
         return productId
         """;
 
+    static String existProduct = """
+        local productId = KEYS[1]
+        if redis.call("HEXISTS", productId, "quantity") == 0 then
+            return nil
+        else
+            return "exist"
+        end
+        """;
     
     // 재고 감소 메소드
     public Object[] decreaseProductQuantityList(List<OrderItemRequestDto> items) {
@@ -142,7 +150,26 @@ public class RedisUtil {
         );
     }
 
+    
+    // 해당 상품이 존재하는지 확인
+    public boolean existProduct(Long productId){
+        boolean result = false;
+        // 존재확인 스크립트 세팅
+        DefaultRedisScript<String> redisScript = new DefaultRedisScript<>();
+        redisScript.setScriptText(existProduct);
+        redisScript.setResultType(String.class);
 
+        String resultRedis = redisTemplate.execute(
+                redisScript,
+                Collections.singletonList(String.valueOf(productId))
+        );
+
+        if ("exist".equals(resultRedis)) {
+            result = true;
+        }
+
+        return result;
+    }
 
 
 }
