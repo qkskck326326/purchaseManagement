@@ -1,6 +1,5 @@
 package co.kr.orderservice.order.entity;
 
-import co.kr.orderservice.feign.toProduct.ProductResponseDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
