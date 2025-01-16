@@ -3,6 +3,20 @@
 >본 프로젝트는 상품에 대한 정보의 정합성을 추구하며,  
 대규모 요청을 처리하는 것을 목표로 하는 프로젝트 입니다.
 
+## 개발환경
+- 언어 : JAVA 21
+- 프레임워크 : SpringBoot 3.2.0
+- 데이터베이스 : MySql 8.0
+- ORM : JPA
+- SpringCloud
+  - Client : Netflix-Eureka
+  - Gateway : WebFlux
+- 기타 주요 의존성 : Security, JJWT, Kafka, Redis
+- 자동화 도구 : Docker, Docker-compose
+- 개발도구
+  - IDE : IntelliJ
+  - Api-test : PostMan, K6
+
 ## API 요청
 ### 유저 - 로그인 관련
 | 용도               | Mapping        | API path                         | 인자                                                                     |
