@@ -4,7 +4,8 @@
 대규모 요청을 처리하는 것을 목표로 하는 프로젝트 입니다.
 
 ## 개발환경
-- 언어 : JAVA 21
+- 프로그래밍 언어 : JAVA 21
+- 빌드 도구 : gradle 8.11.1
 - 프레임워크 : SpringBoot 3.2.0
 - 데이터베이스 : MySql 8.0
 - ORM : JPA
@@ -16,6 +17,15 @@
 - 개발도구
   - IDE : IntelliJ
   - Api-test : PostMan, K6
+
+## **SpringBoot 서비스 구조**
+
+- **eureka-Server** : Netflix Eureka 기반 서비스 디스커버리 및 등록  
+- **api-gateway** : API 요청 라우팅 및 JWT 토큰 검증
+- **user-service** : 사용자 인증/관리 및 JWT 생성
+- **product-service** : 상품 정보 관리
+- **order-service** : 주문 생성 및 관리
+
 
 ## API 요청
 ### 유저 - 로그인 관련
