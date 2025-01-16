@@ -1,24 +1,34 @@
 # Purchase Management
+<br>
+
 ## 프로젝트 소개
->본 프로젝트는 상품에 대한 정보의 정합성을 추구하며,  
+>이 프로젝트는 마이크로서비스 아키텍처(Microservices Architecture)를 기반으로 설계되었습니다.  
+상품에 대한 정보의 정합성을 추구하며,  
 대규모 요청을 처리하는 것을 목표로 하는 프로젝트 입니다.
 
+<br>
+
 ## 개발환경
-- 프로그래밍 언어 : JAVA 21
-- 빌드 도구 : gradle 8.11.1
-- 프레임워크 : SpringBoot 3.2.0
-- 데이터베이스 : MySql 8.0
-- ORM : JPA
+- 프로그래밍 언어 : **JAVA 21**
+- 빌드 도구 : **gradle 8.11.1**
+- 프레임워크 : **SpringBoot 3.2.0**
+- 보안 : **Security, JJWT**
+- 캐싱 : **Redis**
+- 메세지 발행 : **Kafka**
+- 데이터베이스 : **MySql 8.0**
+- ORM : **JPA**
 - SpringCloud
-  - Client : Netflix-Eureka
-  - Gateway : WebFlux
-- 기타 주요 의존성 : Security, JJWT, Kafka, Redis
-- 자동화 도구 : Docker, Docker-compose
+  - Client : **Netflix-Eureka**
+  - Gateway : **WebFlux 방식**
+
+- 자동화 도구 : **Docker, Docker-compose**
 - 개발도구
   - IDE : IntelliJ
-  - Api-test : PostMan, K6
+  - Api-test : PostMan, K6, python
 
-## **SpringBoot 서비스 구조**
+<br>
+
+> **SpringBoot 서비스 구조**
 
 - **eureka-Server** : Netflix Eureka 기반 서비스 디스커버리 및 등록  
 - **api-gateway** : API 요청 라우팅 및 JWT 토큰 검증
@@ -26,9 +36,10 @@
 - **product-service** : 상품 정보 관리
 - **order-service** : 주문 생성 및 관리
 
+<br>
 
 ## API 요청
-### 유저 - 로그인 관련
+#### 유저 - 로그인 관련
 | 용도               | Mapping        | API path                         | 인자                                                                     |
 |--------------------|----------------|----------------------------------|--------------------------------------------------------------------------|
 | 로그인             | `@PostMapping` | `/api/user/security/login`        | `@RequestBody` Map<String, String> loginData, HttpServletRequest request |
@@ -37,7 +48,7 @@
 
 ---
 
-### 유저 - 회원가입 관련
+#### 유저 - 회원가입 관련
 | 용도          | Mapping       | API path                           | 인자                                                                  |
 | ------------ | ---------------| ---------------------------------- | --------------------------------------------------------------------- |
 | 회원 가입     | `@PostMapping` | `/api/user/common/register`        | `@RequestBody` UserEntity(userName, email, password)                  |
@@ -46,7 +57,7 @@
 
 ---
 
-### 상품 관련
+#### 상품 관련
 | 용도           | Mapping        | API path                             | 인자                                       |
 |----------------|----------------|--------------------------------------|--------------------------------------------|
 | 상품 리스트 조회 | `@GetMapping`  | `/api/product`                      | `@RequestParam` size, `@RequestParam` page |
@@ -56,7 +67,7 @@
 
 ---
 
-### 주문 및 위시리스트 관련 API </br>
+#### 주문 및 위시리스트 관련 API </br>
 | 용도                   | Mapping       | API path                                  | 인자                                                                                                             |
 |------------------------|---------------|-------------------------------------------|------------------------------------------------------------------------------------------------------------------|
 | 위시리스트 조회         | `@GetMapping` | `/api/order/wishList`                     | `@RequestHeader` Authorization                                                                                   |
