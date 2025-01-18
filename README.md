@@ -2,13 +2,17 @@
 <br>
 
 ## 프로젝트 소개
->이 프로젝트는 마이크로서비스 아키텍처(Microservices Architecture)를 기반으로 설계되었습니다.  
+
+> 프로젝트 목적
+
+이 프로젝트는 마이크로서비스 아키텍처(Microservices Architecture)를 기반으로 설계되었습니다.  
 상품에 대한 정보의 정합성을 추구하며,  
 대규모 요청을 처리하는 것을 목표로 하는 프로젝트 입니다.
 
 <br>
 
-## 개발환경
+> 개발환경
+
 - 프로그래밍 언어 : **JAVA 21**
 - 빌드 도구 : **gradle 8.11.1**
 - 프레임워크 : **SpringBoot 3.2.0**
@@ -28,7 +32,7 @@
 
 <br>
 
-> **SpringBoot 서비스 구조**
+## **서비스 구조**
 
 - **eureka-Server** : Netflix Eureka 기반 서비스 디스커버리 및 등록  
 - **api-gateway** : API 요청 라우팅 및 JWT 토큰 검증
