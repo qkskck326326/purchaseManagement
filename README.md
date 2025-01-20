@@ -32,8 +32,8 @@
 
 <br>
 
-## **서비스 구조**
-
+## **프로젝트 구조**
+![Project_Structure](https://github.com/user-attachments/assets/0abf3a89-b62c-47f7-947f-ea9bea27663b)
 - **eureka-Server** : Netflix Eureka 기반 서비스 디스커버리 및 등록  
 - **api-gateway** : API 요청 라우팅 및 JWT 토큰 검증
 - **user-service** : 사용자 인증/관리 및 JWT 생성
