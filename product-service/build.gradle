@@ -47,6 +47,9 @@ dependencies {
     implementation 'org.springframework.kafka:spring-kafka'
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // Prometheus
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 }
 
 dependencyManagement {

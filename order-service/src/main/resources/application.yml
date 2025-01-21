@@ -31,6 +31,15 @@ spring:
 jwt:
   secret: bzeXpcSoWC6x5gq5c2gk7DaifjAofTWMpwxUWQYqT5qaLHNHlZWWYyKTXUKqjVo8
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, prometheus
+  endpoint:
+    health:
+      show-details: always
+
 eureka:
   client:
     service-url:
