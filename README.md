@@ -16,31 +16,53 @@
 - 프로그래밍 언어 : **JAVA 21**
 - 빌드 도구 : **gradle 8.11.1**
 - 프레임워크 : **SpringBoot 3.2.0**
-- 보안 : **Security, JJWT**
+- 보안 : **Security 6.1.0, JJWT 0.11.5**
 - 캐싱 : **Redis**
-- 메세지 발행 : **Kafka**
+- 메세지 발행 : **Kafka 3.5.1**
 - 데이터베이스 : **MySql 8.0**
-- ORM : **JPA**
-- SpringCloud
+- ORM : **Spring Data JPA 3.1.0**
+- SpringCloud 2023.0.0
   - Client : **Netflix-Eureka**
   - Gateway : **WebFlux 방식**
 
 - 자동화 도구 : **Docker, Docker-compose**
-- 개발도구
-  - IDE : IntelliJ
-  - Api-test : PostMan, K6, python
+- Api-test : PostMan, K6, python
 
 <br>
 
-## **프로젝트 구조**
+## **프로젝트 기능**
+> 프로젝트 구조
+
 ![Project_Structure](https://github.com/user-attachments/assets/b1c6b5a2-46d0-46d5-a693-5d38a571312e)
-- **eureka-Server** : Netflix Eureka 기반 서비스 디스커버리 및 등록  
-- **api-gateway** : API 요청 라우팅 및 JWT 토큰 검증
-- **user-service** : 사용자 인증/관리 및 JWT 생성
-- **product-service** : 상품 정보 관리
-- **order-service** : 주문 생성 및 관리
 
 <br>
+
+> 각 서비스 주요 기능
+
+**api-gateway** 
+- API 요청 라우팅 및 JWT 토큰 검증
+
+- 들어온 각 요청들을 비동기적으로 각 서비스에 요청
+
+**user-service** : 
+- 사용자 인증 및 JWT 생성 / 반환
+- 사용자 로그인 정보 캐시 저장
+
+**product-service**
+- 상품 최초 색인시 내부 서비스에서 필요한 정보 캐시 저장
+- 상품이 이미 캐시에 저장되어 있을시, 캐시에서 갯수 반환
+
+**order-service** : 주문 생성 및 관리
+- 상품 주문시 캐시에서 상품 리스트의 각 상품 갯수 확인 및 감소
+- 상품 갯수 확인중 특정 상품의 갯수가 부족할 경우, <br>
+  해당 상품 리스트에서 이미 감소시킨 상품들의 갯수 복구.
+
+<br>
+
+## 성능개선
+
+## 트러블슈팅
+
 
 ## API 요청
 #### 유저 - 로그인 관련
