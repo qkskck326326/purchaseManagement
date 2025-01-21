@@ -1,0 +1,20 @@
+global:
+  scrape_interval: 1s
+
+scrape_configs:
+  - job_name: 'user-service'
+    scrape_interval: 5s
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['user-service:8081']
+  - job_name: 'product-service'
+    scrape_interval: 5s
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['product-service:8082']
+  - job_name: 'order-service'
+    scrape_interval: 5s
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['order-service:8083']
+
