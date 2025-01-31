@@ -11,22 +11,25 @@
 
 <br>
 
-> 개발환경
-
-- 프로그래밍 언어 : **JAVA 21**
-- 빌드 도구 : **gradle 8.11.1**
-- 프레임워크 : **SpringBoot 3.2.0**
-- 보안 : **Security 6.1.0, JJWT 0.11.5**
-- 캐싱 : **Redis**
-- 메세지 발행 : **Kafka 3.5.1**
-- 데이터베이스 : **MySql 8.0**
-- ORM : **Spring Data JPA 3.1.0**
-- SpringCloud 2023.0.0
-  - Client : **Netflix-Eureka**
-  - Gateway : **WebFlux 방식**
-
-- 자동화 도구 : **Docker, Docker-compose**
-- Api-test : PostMan, K6, python
+> 사용기술
+>- 프로그래밍 언어 : **JAVA 21**
+>- 빌드 도구 : **gradle 8.11.1**
+>- 프레임워크 : **SpringBoot 3.2.0**
+>- 보안 : **Security 6.1.0, JJWT 0.11.5**
+>- 데이터베이스 : **MySql 8.0**
+>- ORM : **Spring Data JPA 3.1.0**
+>
+>> 분산 시스템 및 서비스 관리
+>>- 서비스 관리: **Spring Cloud 2023.0.0 (Spring Cloud Gateway 포함)**
+>>- 캐싱 : **Redis**
+>>- 메세지 발행 : **Kafka 3.5.1**
+>
+>> 배포 및 운영
+>>- CI/CD : **Docker, Docker-compose**
+>
+>> 테스트 및 모니터링  
+>>- 모니터링 : Prometheus, Grafana
+>>- Api-test : PostMan, K6, python
 
 <br>
 
@@ -54,7 +57,7 @@
 
 **order-service** : 주문 생성 및 관리
 - 상품 주문시 캐시에서 상품 리스트의 각 상품 갯수 확인 및 감소
-- 상품 갯수 확인중 특정 상품의 갯수가 부족할 경우, <br>
+- 상품 갯수 확인중 특정 상품의 갯수가 부족할 경우, 
   해당 상품 리스트에서 이미 감소시킨 상품들의 갯수 복구.
 
 <br>
@@ -64,45 +67,5 @@
 ## 트러블슈팅
 
 
-## API 요청
-#### 유저 - 로그인 관련
-| 용도               | Mapping        | API path                         | 인자                                                                     |
-|--------------------|----------------|----------------------------------|--------------------------------------------------------------------------|
-| 로그인             | `@PostMapping` | `/api/user/security/login`        | `@RequestBody` Map<String, String> loginData, HttpServletRequest request |
-| 로그아웃           | `@PostMapping` | `/api/user/security/logout`       | `@RequestHeader` Authorization, HttpServletRequest request               |
-| 모든 곳에서 로그아웃 | `@PostMapping` | `/api/user/security/logoutAll`    | `@RequestHeader` Authorization                                          |
-
----
-
-#### 유저 - 회원가입 관련
-| 용도          | Mapping       | API path                           | 인자                                                                  |
-| ------------ | ---------------| ---------------------------------- | --------------------------------------------------------------------- |
-| 회원 가입     | `@PostMapping` | `/api/user/common/register`        | `@RequestBody` UserEntity(userName, email, password)                  |
-| 이메일 인증   | `@GetMapping`  | `/api/user/common/verify`          | `@RequestParam` code, `@RequestParam` email                           |
-| 비밀번호 변경 | `@PostMapping` | `/api/user/common/change-password` | `@RequestHeader` Authorization(bearerToken), `@RequestParam` password |
-
----
-
-#### 상품 관련
-| 용도           | Mapping        | API path                             | 인자                                       |
-|----------------|----------------|--------------------------------------|--------------------------------------------|
-| 상품 리스트 조회 | `@GetMapping`  | `/api/product`                      | `@RequestParam` size, `@RequestParam` page |
-| 상품 상세 조회   | `@GetMapping`  | `/api/product/{productId}`          | `@PathVariable` productId                  |
-| 상품 수량 조회   | `@GetMapping`  | `/api/product/quantity/{productId}` | `@PathVariable` productId                  |
-| 상품 가격 조회   | `@GetMapping`  | `/api/product/price/{productId}`    | `@PathVariable` productId                  |
-
----
-
-#### 주문 및 위시리스트 관련 API </br>
-| 용도                   | Mapping       | API path                                  | 인자                                                                                                             |
-|------------------------|---------------|-------------------------------------------|------------------------------------------------------------------------------------------------------------------|
-| 위시리스트 조회         | `@GetMapping` | `/api/order/wishList`                     | `@RequestHeader` Authorization                                                                                   |
-| 위시리스트에 상품 추가  | `@PostMapping` | `/api/order/wishList/{productId}`         | `@PathVariable` productId, `@RequestParam` quantity, `@RequestParam` productName, `@RequestHeader` Authorization |
-| 위시리스트 수량 수정    | `@GetMapping`  | `/api/order/wishList/edit/quantity`       | `@RequestParam` wishListId, `@RequestParam` quantity, `@RequestHeader` Authorization                             |
-| 위시리스트 삭제         | `@GetMapping`  | `/api/order/wishList/delete/{wishListId}` | `@PathVariable` wishListId, `@RequestHeader` Authorization                                                       |
-| 상품 주문              | `@PostMapping` | `/api/order/products`                     | `@RequestBody` List<OrderItemRequestDto>, `@RequestHeader` Authorization                                         |
-| 주문 결제 완료         | `@PostMapping`  | `/api/order/products/payed/{orderId}`     | `@PathVariable` orderId, `@RequestHeader` Authorization                                                         |
-| 주문 취소              | `@PostMapping` | `/api/order/cancellation`                 | `@RequestParam` orderId, `@RequestHeader` Authorization                                                          |
-| 반품 신청              | `@PostMapping` | `/api/order/refund`                       | `@RequestParam` orderId, `@RequestHeader` Authorization                                                          |
-| 주문 정보 목록 조회     | `@GetMapping`  | `/api/order/show`                         | `@RequestHeader` Authorization                                                                                   |
-| 특정 주문 정보 조회     | `@GetMapping`  | `/api/order/show/{orderId}`               | `@PathVariable` orderId, `@RequestHeader` Authorization                                                          |
+## Post Man API 문서 링크
+https://documenter.getpostman.com/view/38023455/2sAYX2Pjpc
