@@ -218,7 +218,7 @@ public class OrderService {
             }
 
             // 토큰의 유저 이름 꺼내기
-            String orderUser = jwtTokenUtil.getUserEmailFromToken(token);
+            String orderUser = order.getUserEmail();
 
             // 주문한 유저와 신청 유저의 email 이 다르다면
             if (!orderUser.equals(userEmail)) {
