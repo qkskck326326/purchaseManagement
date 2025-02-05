@@ -2,6 +2,7 @@ package co.kr.orderservice.order.util;
 
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -17,10 +18,12 @@ public class JwtTokenUtil {
     private String secretKey;
 
     private Key key;
+    private JwtParser jwtParser;
 
     @PostConstruct
     public void init() {
         this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
+        this.jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
     }
 
     public boolean validateToken(String token) {
@@ -33,7 +36,7 @@ public class JwtTokenUtil {
     }
 
     public String getUserEmailFromToken(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+        Claims claims = jwtParser.parseClaimsJws(token).getBody();
         return claims.getSubject();
     }
 }
