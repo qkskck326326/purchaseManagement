@@ -30,6 +30,7 @@ public class OrderService {
     private final ProductProducer productProducer;
 
     // 위시 리스트 가져오기
+    @Transactional
     public List<WishListResponseDto> getWishList(String bearerToken) {
         String userEmail = jwtTokenUtil.getUserEmailFromToken(bearerToken.substring(7));
         List<WishListEntity> list = wishListRepository.findByUserEmail(userEmail);
@@ -39,6 +40,7 @@ public class OrderService {
     }
 
     // 위시리스트에 상품 추가
+    @Transactional
     public String addWishList(Long productId, String productName, String bearerToken, int quantity) {
         String userEmail = jwtTokenUtil.getUserEmailFromToken(bearerToken.substring(7));
         if (wishListRepository.existsByProductIdAndUserEmail(productId, userEmail)){
@@ -56,6 +58,7 @@ public class OrderService {
     }
 
     // 위시리스트 수량 수정
+    @Transactional
     public String editQuantityWishList(Long wishListId, int quantity, String bearerToken) {
         String token = bearerToken.substring(7);
         String userEmail = jwtTokenUtil.getUserEmailFromToken(token);
@@ -75,6 +78,7 @@ public class OrderService {
     }
 
     // 위시리스트 삭제
+    @Transactional
     public String deleteQuantityWishList(Long wishListId, String bearerToken) {
         try {
             String token = bearerToken.substring(7);
@@ -93,6 +97,7 @@ public class OrderService {
     }
 
     // 상품 주문서 만들기
+    @Transactional
     public String orderProducts(List<OrderItemRequestDto> orderListRequestDto, String bearerToken) {
         try {
             String token = bearerToken.substring(7); // 토큰 정제
@@ -114,8 +119,7 @@ public class OrderService {
                 List<ProductOrderItemEntity> orderList = orderListRequestDto
                         .stream().map(dto -> new ProductOrderItemEntity(order.getOrderId(), dto))
                         .toList();
-                System.out.println("주문 갯수 : " + orderList.size());
-                System.out.println("총 가격" + (Integer)redisResult[1]);
+
                 productOrderItemRepository.saveAll(orderList);
                 order.setTotalPrice((Integer) redisResult[1]); // 총 가격 저장
                 productOrderRepository.save(order);
@@ -125,12 +129,12 @@ public class OrderService {
                 return "결제 진입.";
             }
         }catch (Exception e) {
-            System.out.println("주문 처리중 에러 : " + e.getMessage());
             return "주문 처리중 에러 발생 : " + e.getMessage();
         }
     }
 
     // 주문완료
+    @Transactional
     public String orderProductsPayed(Long orderId, String bearerToken) {
         String result;
         String userEmail = jwtTokenUtil.getUserEmailFromToken(bearerToken.substring(7));
@@ -205,6 +209,7 @@ public class OrderService {
     }
 
     // 반품 신청
+    @Transactional
     public String orderRefund(Long orderId, String bearerToken) {
         try {
             String token = bearerToken.substring(7);
@@ -271,12 +276,14 @@ public class OrderService {
     }
 
     // 내 주문 정보 리스트 api
+    @Transactional
     public List<ProductOrderEntity> showOrderList(String bearerToken) {
         String userEmail = jwtTokenUtil.getUserEmailFromToken(bearerToken.substring(7));
         return productOrderRepository.findAllByUserEmail(userEmail);
     }
 
     // 내 주문 정보 API
+    @Transactional
     public ProductOrderEntity showOrder(Long orderId, String bearerToken) {
         String userEmail = jwtTokenUtil.getUserEmailFromToken(bearerToken.substring(7));
         return productOrderRepository.findByOrderIdAndUserEmail(orderId, userEmail)
