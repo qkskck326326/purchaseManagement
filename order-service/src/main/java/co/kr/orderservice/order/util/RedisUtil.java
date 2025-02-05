@@ -66,11 +66,9 @@ public class RedisUtil {
         List<OrderItemRequestDto> processedItem = new ArrayList<>();
         
         // 재고 확인 및 감소 처리
-        System.out.println("재고감소처리 : 시작");
         for (OrderItemRequestDto item : items) {
             // 재고 감소에 성공하면 해당 상품의 가격이 리턴됨
             String result = decreaseProductQuantity(redisScript, item);
-            System.out.println("result = " + result);
             if (result == null) { // price 가 null == 상품이 없다
                 itemState = item.getProductName() + " 이 존재하지 않습니다.";
                 break;
@@ -83,18 +81,15 @@ public class RedisUtil {
                 sum += item.getQuantity() * price; // 총합 += 상품갯수 * 가격
             }
         }
-        System.out.println("재고감소처리 : 끝");
 
         // 처리된 Item 의 숫자가 처리해야했을 갯수보다 작다
         // == 처리 중간에 생긴 문제로 다 처리되지 못함
         // == 주문 처리 실패
         if (processedItem.size() < items.size()) {
-            System.out.println("주문 복구 처리 : 시작");
             redisScript.setScriptText(increaseQuantity); // 감소 스크립트로 변경
             for (OrderItemRequestDto item : processedItem) { // 처리되었던 Item 리스트 복구
                 increaseProductQuantity(redisScript, item);
             }
-            System.out.println("주문 복구 처리 : 종료");
         }else { // 성공시
             itemState = null;
         }
@@ -113,14 +108,12 @@ public class RedisUtil {
 
             for (OrderItemRequestDto item : items) {
                 String redisResult = increaseProductQuantity(redisScript, item);
-                System.out.println("redisResult = " + redisResult);
                 if (redisResult == null) {
                     // 수정점 - 이부분에 삭제되었으나 재고 증가 처리되는 로직 추가 가능
                 }
             }
             result = "success";
         } catch (Exception e) {
-            System.out.println("상품 재고 증가 중 에러 : " + e.getMessage());
             result = e.getMessage();
         }
 
