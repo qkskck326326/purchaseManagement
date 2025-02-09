@@ -115,12 +115,16 @@ public class OrderService {
             if (redisResult[0] != null){ // 갯수 확인 및 감소 성공여부
                 return (String) redisResult[0];
             }else {
-                // 주문 리스트로 변환 및 저장
-                List<ProductOrderItemEntity> orderList = orderListRequestDto
-                        .stream().map(dto -> new ProductOrderItemEntity(order.getOrderId(), dto))
-                        .toList();
+                ProductOrderEntity order = new ProductOrderEntity(userEmail, (Integer) redisResult[1]); // 꺼낸 이메일로 주문서 만들기
+                productOrderRepository.save(order); // 주문서 저장
 
-                productOrderItemRepository.saveAll(orderList);
+                // 주문서의 각 상품 리스트
+                List<ProductOrderItemEntity> orderList = new ArrayList<>();
+                for (OrderItemRequestDto dto : orderListRequestDto) {
+                    orderList.add(new ProductOrderItemEntity(order.getOrderId(), dto));
+                }
+
+                productOrderItemRepository.saveAll(orderList); // 상품 리스트 저장
                 order.setTotalPrice((Integer) redisResult[1]); // 총 가격 저장
                 productOrderRepository.save(order);
 
