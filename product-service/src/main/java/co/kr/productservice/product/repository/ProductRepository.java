@@ -1,12 +1,16 @@
 package co.kr.productservice.product.repository;
 
 import co.kr.productservice.product.entity.ProductEntity;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
@@ -19,4 +23,8 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
     @Transactional
     @Query("UPDATE ProductEntity p SET p.productQuantity = p.productQuantity + :amount WHERE p.productId = :productId")
     int increaseQuantity(@Param("productId") Long productId, @Param("amount") int amount);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT p FROM ProductEntity p WHERE p.productId = :productId")
+    Optional<ProductEntity> findProductToModifyQuantity(@Param("productId") Long productId);
 }
