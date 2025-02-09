@@ -123,6 +123,14 @@ services:
       SPRING_PROFILES_ACTIVE: docker
       EUREKA_SERVER_URL: http://eureka-server:8761/eureka
     command: [ "java", "-jar", "app.jar", "--spring.profiles.active=docker" ]
+    deploy:
+      resources:
+        limits:
+          cpus: "2.5"
+          memory: "4g"
+        reservations:
+          cpus: "2.0"
+          memory: "2g"
 
   user-service:
     container_name: user-service
@@ -168,6 +176,14 @@ services:
       SPRING_PROFILES_ACTIVE: docker
       EUREKA_SERVER_URL: http://eureka-server:8761/eureka
     command: [ "java", "-jar", "app.jar", "--spring.profiles.active=docker" ]
+    deploy:
+      resources:
+        limits:
+          cpus: "2.5"
+          memory: "4g"
+        reservations:
+          cpus: "2.0"
+          memory: "4g"
 
   prometheus:
     image: prom/prometheus:latest
