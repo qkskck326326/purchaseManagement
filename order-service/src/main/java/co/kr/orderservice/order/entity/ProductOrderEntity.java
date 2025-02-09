@@ -47,7 +47,8 @@ public class ProductOrderEntity {
         this.orderAt = new Date();
     }
 
-    public ProductOrderEntity(String userEmail) {
+    public ProductOrderEntity(String userEmail, int totalPrice) {
         this.userEmail = userEmail;
+        this.totalPrice = totalPrice;
     }
 }
