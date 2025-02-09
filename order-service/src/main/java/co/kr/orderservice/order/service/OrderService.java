@@ -125,8 +125,14 @@ public class OrderService {
                 productOrderItemRepository.saveAll(orderList); // 상품 리스트 저장
                 order.setTotalPrice((Integer) redisResult[1]); // 총 가격 저장
 
-                // kafka 메세지 전송 - 재고감소 요청
-                productProducer.decreaseQuantity(order.getOrderId(), orderListRequestDto);
+                // kafka 메세지 비동기 전송 - 재고감소 요청
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        productProducer.decreaseQuantity(order.getOrderId(), orderListRequestDto);
+                    } catch (Exception e) {
+                        System.err.println("Kafka 메시지 전송 중 오류 발생: " + e.getMessage());
+                    }
+                });
                 return "결제 진입.";
             }
         }catch (Exception e) {
