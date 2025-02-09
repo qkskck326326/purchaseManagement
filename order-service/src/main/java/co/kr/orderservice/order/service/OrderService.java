@@ -15,9 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @AllArgsConstructor
@@ -103,14 +105,10 @@ public class OrderService {
             String token = bearerToken.substring(7); // 토큰 정제
             String userEmail = jwtTokenUtil.getUserEmailFromToken(token); // 토큰에서 이메일 꺼내기
 
-            ProductOrderEntity order = new ProductOrderEntity(userEmail); // 꺼낸 이메일로 주문서 만들기
-            productOrderRepository.save(order); // 주문서 저장
-
             // Redis - 상품갯수 확인 및 감소 - 처리에 성공하면 총 가격, 실패한다면 null 이 출력됨
             // [0] = 실패시 실패사유 성공시 null,
             // [1] = 성공시 총 가격
             Object[] redisResult = redisUtil.decreaseProductQuantityList(orderListRequestDto);
-
 
             if (redisResult[0] != null){ // 갯수 확인 및 감소 성공여부
                 return (String) redisResult[0];
@@ -126,7 +124,6 @@ public class OrderService {
 
                 productOrderItemRepository.saveAll(orderList); // 상품 리스트 저장
                 order.setTotalPrice((Integer) redisResult[1]); // 총 가격 저장
-                productOrderRepository.save(order);
 
                 // kafka 메세지 전송 - 재고감소 요청
                 productProducer.decreaseQuantity(order.getOrderId(), orderListRequestDto);
